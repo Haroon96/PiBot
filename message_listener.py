@@ -22,7 +22,7 @@ def handle(msg):
 	if 'youtu.be' in text or 'youtube' in text:
 		create_bot(get_token()).sendMessage(id, 'Processing YouTube link')
 		youtube_handler.handle(id, text)
-	elif 'reboot' == text.lower():
+	elif 'reboot' == text.lower().strip():
 		create_bot(get_token()).sendMessage(id, 'Rebooting media server')
 		os.popen("sudo -S minidlnad -R", 'w').write(open('pass').read())
 	
