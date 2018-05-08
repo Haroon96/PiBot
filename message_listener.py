@@ -8,7 +8,7 @@ from send_message import send_message as sm
 from telepot.loop import MessageLoop
 
 def get_token():
-	token = open("token").read().strip()
+	token = open('token').read().strip()
 	return token
 
 def create_bot(token):	
@@ -17,6 +17,9 @@ def create_bot(token):
 
 def sendMessage(id, msg):
 	create_bot(get_token()).sendMessage(id, msg)
+	
+def getPass():
+	return open('pass').read()
 	
 def handle(msg):
 	print(msg)
@@ -29,20 +32,20 @@ def handle(msg):
 		cmd = text.lower().strip()
 		if 'rms' == cmd:
 			sendMessage(id, 'Rebooting media server')
-			os.popen("sudo -S minidlnad -R", 'w').write(open('pass').read())
+			os.popen("sudo -S minidlnad -R", 'w').write(getPass())
 		elif 'status' == cmd:
 			sendMessage(id, 'Running')
 		elif 'reboot' == cmd:
 			sendMessage(id, 'Rebooting...')
-			os.popen("sudo -S reboot", 'w').write(open('pass').read())
+			os.popen('sudo -S reboot', 'w').write(getPass())
 		elif 'help' == cmd:
 			sendMessage(id, 'status, reboot, rms, help')
 		elif 'update' == cmd:
 			sendMessage(id, 'Pulling updates from GitLab...')
 			subprocess.Popen('git pull https://haroon96:EchoFoxtrot96@gitlab.com/haroon96/HaroonPiBot', shell=True).wait()
-			os.popen("sudo -S reboot", 'w').write(open('pass').read())
+			os.popen('sudo -S reboot', 'w').write(getPass())
 		elif 'magnet:?xt' in text:
-			sendMessage(id, "Starting torrent download...")
+			sendMessage(id, 'Downloading torrent...')
 			subprocess.Popen('qbittorrent ' + text, shell=True)
 			
 			
@@ -56,5 +59,5 @@ def main():
 		time.sleep(10)
 	
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	main()
