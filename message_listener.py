@@ -41,6 +41,10 @@ def handle(msg):
 			sendMessage(id, 'Pulling updates from GitLab...')
 			subprocess.Popen('git pull https://haroon96:EchoFoxtrot96@gitlab.com/haroon96/HaroonPiBot', shell=True).wait()
 			os.popen("sudo -S reboot", 'w').write(open('pass').read())
+		elif 'magnet:?xt' in text:
+			sendMessage(id, "Starting torrent download...")
+			subprocess.Popen('qbittorrent ' + text, shell=True)
+			
 			
 def main():
 	os.chdir(sys.path[0])
