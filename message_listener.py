@@ -39,7 +39,7 @@ def handle(msg):
 			sendMessage(id, 'status, reboot, rms, help')
 		elif 'update' == cmd:
 			sendMessage(id, 'Pulling updates from GitLab...')
-			subprocess.Popen('git pull https://haroon96:EchoFoxtrot96@gitlab.com/haroon96/HaroonPiBot')
+			subprocess.Popen('git pull https://haroon96:EchoFoxtrot96@gitlab.com/haroon96/HaroonPiBot', shell=True)
 			os.popen("sudo -S reboot", 'w').write(open('pass').read())
 			
 def main():
