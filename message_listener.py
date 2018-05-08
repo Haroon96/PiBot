@@ -25,11 +25,18 @@ def handle(msg):
 	if 'youtu.be' in text or 'youtube' in text:
 		sendMessage(id, 'Processing YouTube link')
 		youtube_handler.handle(id, text)
-	elif 'reboot' == text.lower().strip():
-		sendMessage(id, 'Rebooting media server')
-		os.popen("sudo -S minidlnad -R", 'w').write(open('pass').read())
-	elif 'status' == text.lower().strip():
-		sendMessage(id, 'Haroon-Pi is running')
+	else:
+		cmd = text.lower().strip()
+		if 'rms' == cmd:
+			sendMessage(id, 'Rebooting media server')
+			os.popen("sudo -S minidlnad -R", 'w').write(open('pass').read())
+		elif 'status' == cmd:
+			sendMessage(id, 'Haroon-Pi is running')
+		elif 'reboot' == cmd:
+			sendMessage(id, 'Haroon-Pi is running')
+			os.popen("sudo -S reboot", 'w').write(open('pass').read())
+		elif 'help' == cmd:
+			sendMessage(id, 'status, reboot, rms, help')
 	
 def main():
 	os.chdir(sys.path[0])
