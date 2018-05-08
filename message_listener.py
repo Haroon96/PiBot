@@ -4,6 +4,7 @@ import os
 import sys
 from proxy import get_proxy
 import subprocess
+from send_message import send_message as sm
 from telepot.loop import MessageLoop
 
 def get_token():
@@ -30,7 +31,7 @@ def handle(msg):
 			sendMessage(id, 'Rebooting media server')
 			os.popen("sudo -S minidlnad -R", 'w').write(open('pass').read())
 		elif 'status' == cmd:
-			sendMessage(id, 'Haroon-Pi is running')
+			sendMessage(id, 'Haroon-Pi is running.')
 		elif 'reboot' == cmd:
 			sendMessage(id, 'Rebooting...')
 			os.popen("sudo -S reboot", 'w').write(open('pass').read())
@@ -44,6 +45,7 @@ def handle(msg):
 def main():
 	os.chdir(sys.path[0])
 	bot = create_bot(get_token())
+	sm("Listening for new messages...")
 	MessageLoop(bot, handle).run_as_thread()
 	
 	while 1:
