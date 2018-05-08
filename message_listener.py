@@ -15,16 +15,21 @@ def create_bot(token):
 	telepot.api.set_proxy(get_proxy())
 	return telepot.Bot(token)
 
+def sendMessage(id, msg):
+	create_bot(get_token()).sendMessage(id, msg)
+	
 def handle(msg):
 	print(msg)
 	text = msg['text']
 	id = msg['chat']['id']
 	if 'youtu.be' in text or 'youtube' in text:
-		create_bot(get_token()).sendMessage(id, 'Processing YouTube link')
+		sendMessage(id, 'Processing YouTube link')
 		youtube_handler.handle(id, text)
 	elif 'reboot' == text.lower().strip():
-		create_bot(get_token()).sendMessage(id, 'Rebooting media server')
+		sendMessage(id, 'Rebooting media server')
 		os.popen("sudo -S minidlnad -R", 'w').write(open('pass').read())
+	elif 'status' == text.lower().strip():
+		sendMessage(id, 'Haroon-Pi is running')
 	
 def main():
 	os.chdir(sys.path[0])
