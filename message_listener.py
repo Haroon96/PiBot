@@ -4,7 +4,6 @@ import os
 import sys
 from proxy import get_proxy
 import subprocess
-import youtube_handler
 from telepot.loop import MessageLoop
 
 def get_token():
