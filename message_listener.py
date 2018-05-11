@@ -39,11 +39,13 @@ def handle(msg):
 			sendMessage(id, 'Rebooting...')
 			os.popen('sudo -S reboot', 'w').write(getPass())
 		elif 'help' == cmd:
-			sendMessage(id, 'status, reboot, rms, help')
+			sendMessage(id, 'status, reboot, rms, msl, help')
 		elif 'update' == cmd:
 			sendMessage(id, 'Pulling updates from GitLab...')
 			subprocess.Popen('git pull https://haroon96:EchoFoxtrot96@gitlab.com/haroon96/HaroonPiBot', shell=True).wait()
 			os.popen('sudo -S reboot', 'w').write(getPass())
+		elif 'msl' == cmd:
+			sendMessage(id, ', '.join(os.listdir('/mnt/extstorage/mediaserver'))
 			
 			
 def main():
