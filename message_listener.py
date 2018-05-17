@@ -48,8 +48,8 @@ def handle(msg):
 		elif 'msl' == cmd:
 			sendMessage(id, '%0A'.join(os.listdir('/mnt/extstorage/mediaserver')))
 		elif 'purge' == cmd:
-			shutil.rmtree('/mnt/extstorage/')
 			sendMessage(id, 'External storage has been purged')
+			shutil.rmtree('/mnt/extstorage/')
 			
 			
 def main():
