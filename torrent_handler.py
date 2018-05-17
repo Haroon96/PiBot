@@ -3,6 +3,7 @@ import sys
 import zipfile
 import shutil
 import subprocess
+from subprocess import PIPE
 from send_message import send_message
 from bs4 import BeautifulSoup
 from helpers import get, post
@@ -96,22 +97,37 @@ def get_vid_filename():
 	return f
 	
 def get_sub_filename():
-	return search(".srt")			
+	return search(".srt")		
+
+def reencode_audio(vidfile):
+	outfile = vidfile[:-4] + "[RENC].mkv"
+	subprocess.run(["ffmpeg", "-i", vidfile, "-c:v", "copy", "-c:a", "ac3", outfile])
+	return outfile
+	
+def get_audio_codec(vidfile):
+	out = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a:0", "-show_entries", "stream=codec_name", "-of", "default=noprint_wrappers=1:nokey=1", "Desktop"], stdout=PIPE).stdout
+	return out.decode().strip()
 
 def main():
 	changedir()
 
 	name, path = parse_args(sys.argv)
 	
-	if path.find("/tvshows") >= 0:
+	if "/tvshows" in path:
 		changedir(path)
-		sleep(3*60*60) # sleep for 3 hours for subs to be available
-		filename = download_subtitles(name)
-		extract_archive(filename)
-		vidfile = get_vid_filename()	
-		subfile = get_sub_filename()
-		outfile = embed_subs(vidfile, subfile)
-		move_to_server(outfile)
+		vidfile = get_vid_filename()
+
+		if get_audio_codec(vidfile) == 'eac3':
+			vidfile = reencode_audio(vidfile)
+
+		if "/sub" in path:
+			sleep(3*60*60) # sleep for 3 hours for subs to be available
+			subs = download_subtitles(name)
+			extract_archive(subs)
+			subfile = get_sub_filename()
+			vidfile = embed_subs(vidfile, subfile)
+		
+		move_to_server(vidfile)
 		changedir()
 
 	send_message(name + " has finished downloading.")
