@@ -45,7 +45,10 @@ def handle(msg):
 			subprocess.Popen('git pull https://haroon96:EchoFoxtrot96@gitlab.com/haroon96/HaroonPiBot', shell=True).wait()
 			os.popen('sudo -S reboot', 'w').write(getPass())
 		elif 'msl' == cmd:
-			sendMessage(id, ', '.join(os.listdir('/mnt/extstorage/mediaserver')))
+			sendMessage(id, '%0A'.join(os.listdir('/mnt/extstorage/mediaserver')))
+		elif 'purge' == cmd:
+			shutil.rmtree('/mnt/extstorage/')
+			sendMessage(id, 'External storage has been purged')
 			
 			
 def main():
