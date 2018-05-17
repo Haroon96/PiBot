@@ -49,11 +49,11 @@ def handle(msg):
 			sendMessage(id, '%0A'.join(os.listdir('/mnt/extstorage/mediaserver')))
 		elif 'purge' == cmd:
 			sendMessage(id, 'External storage has been purged')
-			shutil.rmtree('/mnt/extstorage/mediaserver/')
-			shutil.rmtree('/mnt/extstorage/tvshows/')
-			shutil.rmtree('/mnt/extstorage/downloads/')
-			
-			
+			dir = '/mnt/extstorage/'
+			for i in os.listdir(dir):
+				if 'downloading' != i:
+					shutil.rmtree(''.join([dir, i]))
+					
 def main():
 	os.chdir(sys.path[0])
 	bot = create_bot(get_token())
