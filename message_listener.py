@@ -2,6 +2,7 @@ import telepot
 import time
 import os
 import sys
+import shutil
 from proxy import get_proxy
 import subprocess
 from send_message import send_message as sm
