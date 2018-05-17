@@ -105,7 +105,7 @@ def reencode_audio(vidfile):
 	return outfile
 	
 def get_audio_codec(vidfile):
-	out = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a:0", "-show_entries", "stream=codec_name", "-of", "default=noprint_wrappers=1:nokey=1", "Desktop"], stdout=PIPE).stdout
+	out = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a:0", "-show_entries", "stream=codec_name", "-of", "default=noprint_wrappers=1:nokey=1", vidfile], stdout=PIPE).stdout
 	return out.decode().strip()
 
 def main():
