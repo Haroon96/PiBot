@@ -46,16 +46,17 @@ def handle(msg):
 			subprocess.Popen('git pull https://haroon96:EchoFoxtrot96@gitlab.com/haroon96/HaroonPiBot', shell=True).wait()
 			os.popen('sudo -S reboot', 'w').write(getPass())
 		elif 'msl' == cmd:
-			sendMessage(id, '%0A'.join(os.listdir('/mnt/extstorage/mediaserver')))
+			list = os.listdir('/mnt/extstorage/mediaserver')
+			for i in list:
+				sendMessage(id, i)
 		elif 'purge' == cmd:
 			sendMessage(id, 'External storage has been purged')
 			dir = '/mnt/extstorage/'
 			for i in os.listdir(dir):
-				if 'downloading' != i:
-					dirname = ''.join([dir, i])
-					shutil.rmtree(dirname)
-					os.mkdir(dirname)
-					
+				dirname = ''.join([dir, i, '/'])
+				shutil.rmtree(dirname)
+				os.mkdir(dirname)
+				
 def main():
 	os.chdir(sys.path[0])
 	bot = create_bot(get_token())
