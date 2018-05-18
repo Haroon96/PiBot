@@ -52,7 +52,9 @@ def handle(msg):
 			dir = '/mnt/extstorage/'
 			for i in os.listdir(dir):
 				if 'downloading' != i:
-					shutil.rmtree(''.join([dir, i]))
+					dirname = ''.join([dir, i])
+					shutil.rmtree(dirname)
+					os.mkdir(dirname)
 					
 def main():
 	os.chdir(sys.path[0])
