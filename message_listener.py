@@ -44,7 +44,6 @@ def handle(msg):
 		elif 'update' == cmd:
 			sendMessage(id, 'Pulling updates from GitLab...')
 			subprocess.Popen('git pull https://haroon96:EchoFoxtrot96@gitlab.com/haroon96/HaroonPiBot', shell=True).wait()
-			sendMessage(id, 'Rebooting...')
 			os.popen('sudo -S reboot', 'w').write(getPass())
 		elif 'msl' == cmd:
 			for i in os.listdir('/mnt/extstorage/mediaserver'):
