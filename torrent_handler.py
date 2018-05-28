@@ -119,13 +119,12 @@ def main():
 
 		if get_audio_codec(vidfile) == 'eac3':
 			vidfile = reencode_audio(vidfile)
-
-		if "/sub" in path:
-			sleep(3*60*60) # sleep for 3 hours for subs to be available
-			subs = download_subtitles(name)
-			extract_archive(subs)
-			subfile = get_sub_filename()
-			vidfile = embed_subs(vidfile, subfile)
+		
+		sleep(3*60*60) # sleep for 3 hours for subs to be available
+		subs = download_subtitles(name)
+		extract_archive(subs)
+		subfile = get_sub_filename()
+		vidfile = embed_subs(vidfile, subfile)
 		
 		move_to_server(vidfile)
 		changedir()
