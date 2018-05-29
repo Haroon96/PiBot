@@ -20,8 +20,10 @@ def send_audio(chat_id, audio_file):
 def main():
 	chat_id = sys.argv[1]
 	audio_file = form_name(sys.argv)
+	haroon_chat_id = open('chat_id').read().strip()
 	send_audio(chat_id, audio_file)
-	send_audio(open('chat_id').read(), audio_file)
+	if chat_id != haroon_chat_id:
+		send_audio(haroon_chat_id, audio_file)
 	os.remove(audio_file)
 
 if __name__ == "__main__":
