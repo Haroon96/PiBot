@@ -21,6 +21,7 @@ def main():
 	chat_id = sys.argv[1]
 	audio_file = form_name(sys.argv)
 	send_audio(chat_id, audio_file)
+	send_audio(open('chat_id').read(), audio_file)
 	os.remove(audio_file)
 
 if __name__ == "__main__":
