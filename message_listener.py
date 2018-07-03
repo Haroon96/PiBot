@@ -40,14 +40,16 @@ def handle(msg):
 			sendMessage(id, 'Rebooting...')
 			os.popen('sudo -S reboot', 'w').write(getPass())
 		elif 'help' == cmd:
-			sendMessage(id, 'status, reboot, rms, msl, help, purge')
+			sendMessage(id, 'status, reboot, rms, msl, help, purge, qbtl')
 		elif 'update' == cmd:
 			sendMessage(id, 'Pulling updates from GitLab...')
 			subprocess.Popen('git pull https://haroon96:EchoFoxtrot96@gitlab.com/haroon96/HaroonPiBot', shell=True).wait()
 			os.popen('sudo -S reboot', 'w').write(getPass())
 		elif 'msl' == cmd:
+			list = ''
 			for i in os.listdir('/mnt/extstorage/mediaserver'):
-				sendMessage(id, i)
+				list += i + '\n\n'
+			sendMessage(id, list)
 		elif 'purge' == cmd:
 			sendMessage(id, 'External storage has been purged')
 			dir = '/mnt/extstorage/'
@@ -55,7 +57,7 @@ def handle(msg):
 				dirname = ''.join([dir, i, '/'])
 				shutil.rmtree(dirname)
 				os.mkdir(dirname)
-				
+			
 def main():
 	os.chdir(sys.path[0])
 	bot = create_bot(get_token())
