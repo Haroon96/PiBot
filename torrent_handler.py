@@ -57,6 +57,7 @@ def make_result_url(postfix):
 def download_subtitles(name):
 	search_url = make_search_url(name)
 	html = get(search_url)
+	print(html)
 	dllink = parse(html)
 	sub = get(dllink)
 
@@ -109,8 +110,6 @@ def get_audio_codec(vidfile):
 	return out.decode().strip()
 
 def main():
-	changedir()
-
 	name, path = parse_args(sys.argv)
 	
 	if "/tvshows" in path:
@@ -121,13 +120,16 @@ def main():
 			vidfile = reencode_audio(vidfile)
 		
 		sleep(3*60*60) # sleep for 3 hours for subs to be available
-		subs = download_subtitles(name)
-		extract_archive(subs)
-		subfile = get_sub_filename()
-		vidfile = embed_subs(vidfile, subfile)
 		
-		move_to_server(vidfile)
-		changedir()
+		try:
+			subs = download_subtitles(name)
+			extract_archive(subs)
+			subfile = get_sub_filename()
+			vidfile = embed_subs(vidfile, subfile)
+		except:
+			send_message("Failed to encode subs for " + name)
+		finally:
+			move_to_server(vidfile)
 
 	send_message(name + " has finished downloading.")
 		
