@@ -1,14 +1,13 @@
 import os
 import sys
-import zipfile
 import shutil
 import subprocess
 from subprocess import PIPE
 from send_message import send_message
 from bs4 import BeautifulSoup
-from helpers import get, post
 from time import sleep
-
+from babelfish import Language
+from subliminal import Video, download_best_subtitles, save_subtitles
 
 def get_server_location():
 	return "/mnt/extstorage/mediaserver/"
@@ -26,52 +25,12 @@ def parse_args(argv):
 	path = " ".join(argv[j + 1:])
 	return name, path
 
-def parse(html):
-	soup = BeautifulSoup(html, 'html.parser')
-	results = soup.find('table').findAll('tr')[1:]
-	
-	partial_link = ""
-	for result in results:
-		ok = True
-		if result.findAll('td')[0].text.find('English') == -1:
-			ok = False
-		if len(result.findAll('td', attrs={"class":"a41"})) > 0:
-			ok = False
-		if ok:
-			partial_link = result.find('a')['href']
-			break
-
-	link = make_result_url(partial_link)
-	html = post(link)
-	
-	soup = BeautifulSoup(html, 'html.parser')
-	dllink = soup.find('a',{"id":"downloadButton"})['href']
-	return make_result_url(dllink)
-	
-def make_search_url(query):	
-	return "https://subscene.com/subtitles/release?q=" + query
-
-def make_result_url(postfix):
-	return "https://subscene.com" + postfix	
-
 def download_subtitles(name):
-	search_url = make_search_url(name)
-	html = get(search_url)
-	print(html)
-	dllink = parse(html)
-	sub = get(dllink)
-
-	filename = "subs.zip"
-	f = open(filename, "wb")
-	f.write(sub)
-	f.close()
-
-	return filename
-
-def extract_archive(filename):
-	zip_ref = zipfile.ZipFile(filename, 'r')
-	zip_ref.extractall()
-	zip_ref.close()
+	v = Video.fromname(name)
+	print(v)
+	subs = download_best_subtitles([v], { Language("eng") })
+	save_subtitles(v, subs[v])
+	return f"{name[:-4]}.en.srt"
 
 def move_to_server(filename):
 	shutil.move(filename, get_server_location() + "/" + filename)
@@ -95,10 +54,7 @@ def get_vid_filename():
 	f = search(".mkv")
 	if (f == 0):
 		f = search(".mp4")
-	return f
-	
-def get_sub_filename():
-	return search(".srt")		
+	return f	
 
 def reencode_audio(vidfile):
 	outfile = vidfile[:-4] + "[RENC].mkv"
@@ -119,16 +75,15 @@ def main():
 		if get_audio_codec(vidfile) == 'eac3':
 			vidfile = reencode_audio(vidfile)
 		
-		sleep(3*60*60) # sleep for 3 hours for subs to be available
+		#sleep(3*60*60) # sleep for 3 hours for subs to be available
 		
 		try:
-			subs = download_subtitles(name)
-			extract_archive(subs)
-			subfile = get_sub_filename()
+			subfile = download_subtitles(vidfile)
 			vidfile = embed_subs(vidfile, subfile)
 		except:
 			send_message("Failed to encode subs for " + name)
 		finally:
+			print("finally")
 			move_to_server(vidfile)
 
 	send_message(name + " has finished downloading.")
