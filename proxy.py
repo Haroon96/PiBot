@@ -6,11 +6,13 @@ from os import system
 def get_url():
 	return "https://free-proxy-list.net/";
 
-def parse(html):
+def test_ip(ip):
+	return True if system("ping -c 1 " + ip) is 0 else False
+	
+def get_proxies(html):
 	soup = BeautifulSoup(html, 'html.parser')
 	rawproxies = soup.find('table', attrs={'id' : 'proxylisttable'}).findAll('tr')[1:50]
 
-	proxies = []
 	for i in rawproxies:
 		proxy = i.findAll('td')
 		protocol = "http"
@@ -20,16 +22,4 @@ def parse(html):
 		port = proxy[1].text
 
 		if test_ip(ip):
-			print(protocol + "://" + ip + ":" + port)
-			return protocol + "://" + ip + ":" + port
-
-	return 0
-
-def test_ip(ip):
-	return True if system("ping -c 1 " + ip) is 0 else False
-
-def get_proxy():
-	#url = get_url()
-	#html = get(url)
-	#return parse(html)
-	return "http://185.93.3.123:8080"
+			yield protocol + "://" + ip + ":" + port

@@ -1,7 +1,7 @@
 import telepot
 import sys
 import os
-from proxy import get_proxy
+from proxy import get_proxies
 
 def check_args(args):
 	if len(args) <= 1:
@@ -23,13 +23,21 @@ def load_config():
 def form_message(args):
 	return " ".join(args[1:])
 
-def create_bot(token):	
-	telepot.api.set_proxy(get_proxy())
+def create_bot(proxy, token):
+	telepot.api.set_proxy(proxy)
 	return telepot.Bot(token)
 
 def send_message(message):
 	chat_id, token = load_config()
-	create_bot(token).sendMessage(chat_id, message)
+	messageSent = False
+	for proxy in get_proxies():
+		try:
+			print("Trying for", proxy, end="...")
+			create_bot(proxy, token).sendMessage(chat_id, message)
+			print("Succeeded")
+			return
+		except:
+			print("Failed")
 
 def main():
 	if check_args(sys.argv):
