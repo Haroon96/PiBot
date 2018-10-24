@@ -27,7 +27,6 @@ def parse_args(argv):
 
 def download_subtitles(name):
 	v = Video.fromname(name)
-	print(v)
 	subs = download_best_subtitles([v], { Language("eng") })
 	save_subtitles(v, subs[v])
 	return f"{name[:-4]}.en.srt"
