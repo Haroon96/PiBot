@@ -10,7 +10,7 @@ from babelfish import Language
 from subliminal import Video, download_best_subtitles, save_subtitles
 
 def get_server_location():
-	return "/mnt/extstorage/mediaserver/"
+	return "/mnt/mediaserver/"
 
 def changedir(path=0):
 	if (path == 0):
@@ -27,7 +27,6 @@ def parse_args(argv):
 
 def download_subtitles(name):
 	v = Video.fromname(name)
-	print(v)
 	subs = download_best_subtitles([v], { Language("eng") })
 	save_subtitles(v, subs[v])
 	return f"{name[:-4]}.en.srt"
@@ -83,7 +82,6 @@ def main():
 		except:
 			send_message("Failed to encode subs for " + name)
 		finally:
-			print("finally")
 			move_to_server(vidfile)
 
 	send_message(name + " has finished downloading.")
