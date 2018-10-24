@@ -9,7 +9,8 @@ def get_url():
 def test_ip(ip):
 	return True if system("ping -c 1 " + ip) is 0 else False
 	
-def get_proxies(html):
+def get_proxies():
+	html = get(get_url())
 	soup = BeautifulSoup(html, 'html.parser')
 	rawproxies = soup.find('table', attrs={'id' : 'proxylisttable'}).findAll('tr')[1:50]
 

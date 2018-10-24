@@ -29,7 +29,6 @@ def create_bot(proxy, token):
 
 def send_message(message):
 	chat_id, token = load_config()
-	messageSent = False
 	for proxy in get_proxies():
 		try:
 			print("Trying for", proxy, end="...")

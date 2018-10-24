@@ -66,7 +66,7 @@ def get_audio_codec(vidfile):
 
 def main():
 	name, path = parse_args(sys.argv)
-	
+
 	if "/tvshows" in path:
 		changedir(path)
 		vidfile = get_vid_filename()

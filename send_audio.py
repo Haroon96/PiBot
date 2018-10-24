@@ -1,7 +1,7 @@
 import telepot
 import sys
 import os
-from proxy import get_proxy
+from proxy import get_proxies
 
 def get_token():
 	token = open("token").read().strip()
@@ -10,12 +10,21 @@ def get_token():
 def form_name(args):
 	return "".join(args[2:])
 
-def create_bot(token):	
-	telepot.api.set_proxy(get_proxy())
+def create_bot(proxy, token):
+	telepot.api.set_proxy(proxy)
 	return telepot.Bot(token)
 
 def send_audio(chat_id, audio_file):
-	create_bot(get_token()).sendAudio(chat_id, open(audio_file, 'rb'))
+	token = get_token()
+	for proxy in get_proxies():
+		try:
+			print("Trying for", proxy, end="...")
+			create_bot(proxy, token).sendAudio(chat_id, open(audio_file, 'rb'))
+			print("Succeeded")
+			return
+		except:
+			print("Failed")
+
 
 def main():
 	chat_id = sys.argv[1]

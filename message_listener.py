@@ -3,7 +3,7 @@ import time
 import os
 import sys
 import shutil
-from proxy import get_proxy
+from proxy import get_proxies
 import subprocess
 from send_message import send_message as sm
 from telepot.loop import MessageLoop
@@ -47,7 +47,7 @@ def handle(msg):
 			os.popen('sudo -S reboot', 'w').write(getPass())
 		elif 'msl' == cmd:
 			list = ''
-			for i in os.listdir('/mnt/extstorage/mediaserver'):
+			for i in os.listdir('/mnt/mediaserver'):
 				list += i + '\n\n'
 			sendMessage(id, list)
 		elif 'purge' == cmd:
