@@ -92,7 +92,7 @@ def main():
 		if get_audio_codec(vidfile) == 'eac3':
 			vidfile = reencode_audio(vidfile)
 
-		# sleep(3*60*60) # sleep for 3 hours for subs to be available
+		sleep(3*60*60) # sleep for 3 hours for subs to be available
 
 		try:
 			subfile = download_subtitles(vidfile)
