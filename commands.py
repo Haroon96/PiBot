@@ -11,10 +11,11 @@ def download_youtube_audio(params, chat_id):
 	bot = Bot()
 	bot.send_message(chat_id, "Downloading...")
 	out_filename = f'ytdl-{random.randint(0, 1000)}'
-	out_template = f'{out_filename}.%(ext)s'
+	out_template = f'{out_filename}.%\(ext\)s'
 	audio_filename = f'{out_filename}.mp3'
 	subprocess.Popen(f'youtube-dl -o {out_template} -x --audio-format mp3 --audio-quality 320k {params}', shell=True).wait()
 	bot.send_audio(chat_id, open(audio_filename, 'rb'))
+	os.remove(audio_filename)
 
 
 def reboot_media_server(params, chat_id):
