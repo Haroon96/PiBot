@@ -10,12 +10,11 @@ from proxy_manager import update_proxy as _update_proxy
 
 def download_youtube_audio(params, chat_id):
 	bot = Bot()
-	bot.send_message(chat_id, "Downloading...")
-	process = subprocess.run(f'youtube-dl -o %\(title\)s.%\(ext\)s -x --get-filename --audio-format mp3 --audio-quality 320k {params}', stdout=PIPE, shell=True)
+	bot.send_message(chat_id, "Starting download...")
+	process = subprocess.run(f'youtube-dl -o %\(title\)s.%\(ext\)s --get-filename {params}', stdout=PIPE, shell=True)
 	out = process.stdout.decode()
 	audio_filename = f"{out[:out.rindex('.')]}.mp3"
 	subprocess.run(f'youtube-dl -o %\(title\)s.%\(ext\)s -x --audio-format mp3 --audio-quality 320k {params}', shell=True)
-	bot.send_audio(chat_id, open(audio_filename, 'rb'))
 	os.remove(audio_filename)
 
 
