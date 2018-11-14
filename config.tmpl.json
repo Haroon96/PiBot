@@ -1,0 +1,9 @@
+{
+    "use_proxy": false,
+    "proxy_url": "",
+    "master_chat_id": "",
+    "bot_token": "",
+    "sudo_password": "",
+    "media_server_path": "",
+    "remote_repo": ""
+}
