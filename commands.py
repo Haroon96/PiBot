@@ -13,7 +13,7 @@ def download_youtube_audio(params, chat_id):
 	out_filename = f'ytdl-{random.randint(0, 1000)}'
 	out_template = f'{out_filename}.%\(ext\)s'
 	audio_filename = f'{out_filename}.mp3'
-	subprocess.Popen(f'youtube-dl -o {out_template} -x --audio-format mp3 --audio-quality 320k {params}', shell=True).wait()
+	subprocess.run(f'youtube-dl -o {out_template} -x --audio-format mp3 --audio-quality 320k {params}', shell=True)
 	bot.send_audio(chat_id, open(audio_filename, 'rb'))
 	os.remove(audio_filename)
 
@@ -35,7 +35,7 @@ def reboot(params, chat_id):
 def update(params, chat_id):
 	Bot().send_message(chat_id, 'Pulling updates...')
 	remote_repo = Config().read('remote_repo')
-	subprocess.Popen(f'git pull {remote_repo}', shell=True).wait()
+	subprocess.run(f'git pull {remote_repo}', shell=True)
 	reboot(params, chat_id)
 
 def update_proxy(params, chat_id):
