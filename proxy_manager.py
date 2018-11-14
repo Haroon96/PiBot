@@ -1,11 +1,15 @@
 import urllib3
 from bs4 import BeautifulSoup
-from helpers import get
 from os import system
 from config import Config
 
 proxy_list_url = 'https://free-proxy-list.net/'
 telegram_url = 'https://core.telegram.org/bots/api'
+
+def get(url):
+	http = urllib3.PoolManager()
+	r = http.request('GET', url)
+	return r.data
 
 def generate_proxies():
 	html = get(proxy_list_url)
