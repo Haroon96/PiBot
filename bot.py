@@ -45,5 +45,3 @@ class Bot:
 	def send_master_message(self, msg):
 		self.send_message(Config().read('master_chat_id'), msg)
 	
-	def listen(self, handler):
-		MessageLoop(self.bot, handler).run_as_thread()

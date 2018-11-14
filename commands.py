@@ -15,6 +15,7 @@ def download_youtube_audio(params, chat_id):
 	out = process.stdout.decode()
 	audio_filename = f"{out[:out.rindex('.')]}.mp3"
 	subprocess.run(f'youtube-dl -o %\(title\)s.%\(ext\)s -x --audio-format mp3 --audio-quality 320k {params}', shell=True)
+	bot.send_audio(chat_id, open(audio_filename, 'rb'))
 	os.remove(audio_filename)
 
 
