@@ -12,6 +12,7 @@ def handle(message):
 def main():
 	bot = Bot()
 
+	bot.send_master_message('Booted!')
 	# start listening for new messages
 	MessageLoop(bot.bot, handle).run_as_thread()
 

@@ -40,3 +40,6 @@ class Bot:
 
 	def send_audio(self, audio, chat_id):
 		self.bot.sendAudio(audio, chat_id)
+
+	def send_master_message(self, msg):
+		self.send_message(Config().read('master_chat_id'), msg)
