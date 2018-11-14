@@ -37,7 +37,7 @@ class Bot:
 			return False
 
 	def send_message(self, msg, chat_id):
-		self.bot.sendMessage(msg, chat_id, parse_mode='Markdown')
+		self.bot.sendMessage(msg, chat_id)
 
 	def send_audio(self, audio, chat_id):
 		self.bot.sendAudio(audio, chat_id)
