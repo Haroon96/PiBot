@@ -2,6 +2,7 @@ import subprocess
 import os
 import shutil
 import random
+from subprocess import PIPE
 from config import Config
 from bot import Bot
 from proxy_manager import update_proxy as _update_proxy
@@ -10,10 +11,9 @@ from proxy_manager import update_proxy as _update_proxy
 def download_youtube_audio(params, chat_id):
 	bot = Bot()
 	bot.send_message(chat_id, "Downloading...")
-	out_filename = f'ytdl-{random.randint(0, 1000)}'
-	out_template = f'{out_filename}.%\(ext\)s'
-	audio_filename = f'{out_filename}.mp3'
-	subprocess.run(f'youtube-dl -o {out_template} -x --audio-format mp3 --audio-quality 320k {params}', shell=True)
+	process = subprocess.run(f'youtube-dl -o %\(title\)s.%\(ext\)s -x --get-filename --audio-format mp3 --audio-quality 320k {params}', stdout=PIPE, shell=True)
+	audio_filename = process.stdout
+	subprocess.run(f'youtube-dl -o %\(title\)s.%\(ext\)s -x --audio-format mp3 --audio-quality 320k {params}', stdout=PIPE, shell=True)
 	bot.send_audio(chat_id, open(audio_filename, 'rb'))
 	os.remove(audio_filename)
 
