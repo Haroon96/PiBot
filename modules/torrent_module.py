@@ -3,11 +3,12 @@ import sys
 import shutil
 import subprocess
 from subprocess import PIPE
-from send_message import send_message
 from bs4 import BeautifulSoup
 from time import sleep
 from babelfish import Language
 from subliminal import Video, download_best_subtitles, save_subtitles
+sys.path.append('../')
+from bot import Bot
 
 def get_server_location():
 	return "/mnt/mediaserver/"
@@ -67,24 +68,27 @@ def get_audio_codec(vidfile):
 def main():
 	name, path = parse_args(sys.argv)
 
+	bot = Bot()
+
 	if "/tvshows" in path:
+		bot.send_master_message(f'Waiting for subs for {name}')
 		changedir(path)
 		vidfile = get_vid_filename()
 
 		if get_audio_codec(vidfile) == 'eac3':
 			vidfile = reencode_audio(vidfile)
 		
-		#sleep(3*60*60) # sleep for 3 hours for subs to be available
+		# sleep(3*60*60) # sleep for 3 hours for subs to be available
 		
 		try:
 			subfile = download_subtitles(vidfile)
 			vidfile = embed_subs(vidfile, subfile)
 		except:
-			send_message("Failed to encode subs for " + name)
+			bot.send_master_message(f'Failed to encode subs for {name}')
 		finally:
 			move_to_server(vidfile)
 
-	send_message(name + " has finished downloading.")
+	bot.send_master_message(f'{name} has finished downloading')
 		
 if __name__ == "__main__":
 	main()

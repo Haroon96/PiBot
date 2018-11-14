@@ -1,6 +1,7 @@
 from config import Config
 from proxy_manager import update_proxy
 import telepot
+from telepot.loop import MessageLoop
 
 class Bot:
 	def __init__(self):
@@ -43,3 +44,6 @@ class Bot:
 
 	def send_master_message(self, msg):
 		self.send_message(Config().read('master_chat_id'), msg)
+	
+	def listen(self, handler):
+		MessageLoop(self.bot, handler).run_as_thread()
