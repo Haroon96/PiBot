@@ -25,7 +25,7 @@ def interpret(msg, chat_id):
 	args = msg.split(' ')
 	
 	cmd = args[0].lower()
-	params = args[1:]
+	params = ''.join(args[1:])
 
 	if cmd == 'help':
 		Bot().send_message(chat_id, generate_help())
