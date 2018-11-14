@@ -30,7 +30,7 @@ class Bot:
 
 	def check_connection(self, bot):
 		try:
-			print(bot.getMe())
+			bot.getMe()
 			return True
 		except:
 			return False

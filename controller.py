@@ -27,8 +27,6 @@ def interpret(msg, chat_id):
 	cmd = args[0].lower()
 	params = args[1:]
 
-	print(cmd, params)
-
 	if cmd == 'help':
 		Bot().send_message(chat_id, generate_help())
 	elif cmd in command_dict:
