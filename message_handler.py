@@ -2,7 +2,6 @@ from bot import Bot
 import time
 from config import Config
 from controller import interpret
-from telepot.loop import MessageLoop
 
 def handler(message):
 	text = message['text']
@@ -14,8 +13,8 @@ def main():
 
 	bot.send_master_message('Booted!')
 	# start listening for new messages
-
-	MessageLoop(bot.bot, handler).run_as_thread()
+	
+	bot.listen(handler)
 
 	while 1:
 		time.sleep(10)
