@@ -8,11 +8,6 @@ from time import sleep
 from babelfish import Language
 from subliminal import Video, download_best_subtitles, save_subtitles
 
-sys.path.append('../')
-from bot import Bot
-from config import Config
-
-
 def changedir(path=0):
 	if (path == 0):
 		path = os.path.realpath(__file__)
@@ -21,10 +16,8 @@ def changedir(path=0):
 
 
 def parse_args(argv):
-	i = argv.index("--name")
-	j = argv.index("--path")
-	name = " ".join(argv[i + 1:j])
-	path = " ".join(argv[j + 1:])
+	path = " ".join(argv[1:])
+	name = path[path.rindex('/') + 1:]
 	return name, path
 
 
@@ -59,10 +52,12 @@ def search(ext):
 
 
 def get_vid_filename():
-	f = search(".mkv")
-	if (f == 0):
-		f = search(".mp4")
-	return f
+	exts = ['.mkv', '.mp4', '.avi']
+	for e in exts:
+		f = search(e)
+		if (f != 0):
+			return f
+	return 0
 
 
 def reencode_audio(vidfile):
@@ -86,6 +81,7 @@ def main():
 	# only download subs for shows inside tvshows subdirectory
 	if "/tvshows" in path:
 		bot.send_master_message(f'Waiting for subs for {name}')
+		print(path)
 		changedir(path)
 		vidfile = get_vid_filename()
 
@@ -106,4 +102,8 @@ def main():
 
 
 if __name__ == "__main__":
+	changedir()
+	sys.path.append('../')
+	from bot import Bot
+	from config import Config
 	main()

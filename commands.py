@@ -15,6 +15,7 @@ def download_youtube_audio(params, chat_id):
 	out = process.stdout.decode()
 	audio_filename = f"{out[:out.rindex('.')]}.mp3"
 	subprocess.run(f'youtube-dl -o %\(title\)s.%\(ext\)s -x --audio-format mp3 --audio-quality 320k {params}', shell=True)
+	print(audio_filename)
 	bot.send_audio(chat_id, open(audio_filename, 'rb'))
 	os.remove(audio_filename)
 
@@ -39,6 +40,7 @@ def update(params, chat_id):
 	subprocess.run(f'git pull {remote_repo}', shell=True)
 	reboot(params, chat_id)
 
+
 def update_proxy(params, chat_id):
 	Bot().send_message(chat_id, 'Updating proxy...')
 	_update_proxy()
@@ -59,3 +61,9 @@ def purge_media_server(params, chat_id):
 	shutil.rmtree(dir)
 	os.mkdir(dir)
 	Bot().send_message(chat_id, 'Media server has been purged')
+
+
+def download_torrent(params, chat_id):
+	subprocess.run(f'qbittorrent "{params}"', shell=True)
+	Bot().send_message(chat_id, 'Starting torrent download...')
+	

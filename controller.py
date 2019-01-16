@@ -7,13 +7,14 @@ def add_command(cmd, action, info):
 
 def init_commands():
 	add_command('ytdl', commands.download_youtube_audio, 'Download audio from Youtube')
-	add_command('rms', commands.download_youtube_audio, 'Reboot MiniDLNA server')
+	add_command('rms', commands.reboot_media_server, 'Reboot MiniDLNA server')
 	add_command('status', commands.status_check, 'Check the status of the bot')
 	add_command('reboot', commands.reboot, 'Reboot the device')
 	add_command('upd', commands.update, 'Update code (Pull from remote repo)')
 	add_command('lms', commands.list_media_server, 'List the media available in media server directory')
 	add_command('pms', commands.purge_media_server, 'Clear the media server directory')
 	add_command('upx', commands.update_proxy, 'Fetch a new proxy')
+	add_command('qbt', commands.download_torrent, 'Download torrents using qBittorrent')
 
 def generate_help():
 	ref = ''
