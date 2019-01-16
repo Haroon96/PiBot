@@ -13,7 +13,6 @@ def main():
 
 	bot.send_master_message('Booted!')
 	# start listening for new messages
-
 	bot.listen(handler)
 
 	while 1:
