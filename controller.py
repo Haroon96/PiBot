@@ -12,7 +12,7 @@ def init_commands():
 	add_command('reboot', commands.reboot, 'Reboot the device')
 	add_command('upd', commands.update, 'Update code (Pull from remote repo)')
 	add_command('lms', commands.list_media_server, 'List the media available in media server directory')
-	add_command('pms', commands.purge_media_server, 'Clear the media server directory')
+	add_command('pbd', commands.purge_base_directory, 'Clear base directory')
 	add_command('upx', commands.update_proxy, 'Fetch a new proxy')
 	add_command('qbt', commands.download_torrent, 'Download torrents using qBittorrent')
 

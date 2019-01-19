@@ -4,6 +4,9 @@
     "master_chat_id": "",
     "bot_token": "",
     "sudo_password": "",
-    "media_server_path": "",
+    "base_directory": "/mnt",
+    "media_server_directory": "/mediaserver",
+    "subs_download_directory": "/tvshows",
+    "subs_wait_period": "0",
     "remote_repo": ""
 }

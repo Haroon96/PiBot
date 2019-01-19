@@ -21,7 +21,7 @@ def download_youtube_audio(params, chat_id):
 
 
 def reboot_media_server(params, chat_id):
-	Bot().send_message(chat_id, 'Rebooting MiniDLNA server')
+	Bot().send_message(chat_id, 'Rebooting MiniDLNA server.')
 	os.popen("sudo -S minidlnad -R", 'w').write(Config().read('sudo_password'))
 
 
@@ -49,21 +49,27 @@ def update_proxy(params, chat_id):
 
 def list_media_server(params, chat_id):
 	response = ''
-	for i in os.listdir(Config().read('media_server_path')):
+	for i in os.listdir(get_media_server_path()):
 		response += f'{i}\n'
 	if response == '':
-		response = 'Media server is empty'
+		response = 'Media server is empty.'
 	Bot().send_message(chat_id, response)
 
 
-def purge_media_server(params, chat_id):
-	dir = Config().read('media_server_path')
-	shutil.rmtree(dir)
-	os.mkdir(dir)
-	Bot().send_message(chat_id, 'Media server has been purged')
+def purge_base_directory(params, chat_id):
+	dir = Config().read('base_directory')
+	for i in os.listdir(dir):
+		shutil.rmtree(f'{ dir }/{ i }', ignore_errors=True)
+		os.mkdir(f'{ dir }/{ i }')
+	Bot().send_message(chat_id, 'Base directory has been purged.')
 
 
 def download_torrent(params, chat_id):
 	subprocess.run(f'qbittorrent "{params}"', shell=True)
 	Bot().send_message(chat_id, 'Starting torrent download...')
 	
+
+def get_media_server_path():
+	base_dir = Config().read('base_directory')
+	media_server_dir = Config().read('media_server_directory')
+	return base_dir + media_server_dir

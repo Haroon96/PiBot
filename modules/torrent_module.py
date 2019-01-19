@@ -28,12 +28,14 @@ def download_subtitles(name):
 	return f"{name[:-4]}.en.srt"
 
 
+def get_media_server_path():
+	base_dir = Config().read('base_directory')
+	media_server_dir = Config().read('media_server_directory')
+	return base_dir + media_server_dir
+
+
 def move_to_server(filename):
-	shutil.move(filename, Config().read('media_server_path') + "/" + filename)
-
-
-def copy_to_server(filename):
-	shutil.copy(filename,  Config().read('media_server_path') + "/" + filename)
+	shutil.move(filename, f'{ get_media_server_path() }/{ filename }')
 
 
 def embed_subs(vidfile, subfile):
@@ -43,21 +45,12 @@ def embed_subs(vidfile, subfile):
 	return outfile
 
 
-def search(ext):
-	files = os.listdir()
-	for f in files:
-		if f.endswith(ext):
-			return f
-	return 0
-
-
-def get_vid_filename():
-	exts = ['.mkv', '.mp4', '.avi']
+def is_video(f):
+	exts = ['.mkv', '.mp4', '.avi', '.m4v']
 	for e in exts:
-		f = search(e)
-		if (f != 0):
-			return f
-	return 0
+		if f.endswith(e):
+			return True
+	return False
 
 
 def reencode_audio(vidfile):
@@ -74,33 +67,37 @@ def get_audio_codec(vidfile):
 
 
 def main():
-	name, path = parse_args(sys.argv)
-
+	name, base_path = parse_args(sys.argv)
 	bot = Bot()
 
+	bot.send_master_message(f'{name} has been downloaded.')
+	
 	# only download subs for shows inside tvshows subdirectory
-	if "/tvshows" in path:
-		bot.send_master_message(f'Waiting for subs for {name}')
-		print(path)
-		changedir(path)
-		vidfile = get_vid_filename()
+	if Config().read('subs_download_directory') in base_path:
+		bot.send_master_message(f'Waiting for subs for {name}.')
 
-		if get_audio_codec(vidfile) == 'eac3':
-			tmpvidfile = vidfile
-			vidfile = reencode_audio(vidfile)
-			os.remove(tmpvidfile)
+		sleep(int(Config().read('subs_wait_period')))
+		
+		for path, _dirs, files in os.walk(base_path, topdown=False):
+			for vidfile in files:
+				if is_video(vidfile):
 
-		sleep(3 * 60 * 60) # sleep for 3 hours for subs to be available
+					changedir(path)
 
-		try:
-			subfile = download_subtitles(vidfile)
-			vidfile = embed_subs(vidfile, subfile)
-		except:
-			bot.send_master_message(f'Failed to encode subs for {name}')
-		finally:
-			move_to_server(vidfile)
+					if get_audio_codec(vidfile) == 'eac3':
+						tmpvidfile = vidfile
+						vidfile = reencode_audio(vidfile)
+						os.remove(tmpvidfile)
 
-	bot.send_master_message(f'{name} has finished downloading')
+					try:
+						subfile = download_subtitles(vidfile)
+						vidfile = embed_subs(vidfile, subfile)
+					except:
+						bot.send_master_message(f'Failed to encode subs for {vidfile}.')
+					finally:
+						move_to_server(vidfile)
+
+		bot.send_master_message(f'{name} has finished being subbed.')
 
 
 if __name__ == "__main__":
