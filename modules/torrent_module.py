@@ -83,20 +83,23 @@ def main():
 		bot.send_master_message(f'Waiting for subs for {name}')
 		print(path)
 		changedir(path)
-		vidfile = get_vid_filename()
+		origvidfile = get_vid_filename()
 
-		if get_audio_codec(vidfile) == 'eac3':
-			vidfile = reencode_audio(vidfile)
+		if get_audio_codec(origvidfile) == 'eac3':
+			tmpvidfile = origvidfile
+			origvidfile = reencode_audio(origvidfile)
+			os.remove(tmpvidfile)
 
 		sleep(3*60*60) # sleep for 3 hours for subs to be available
 
 		try:
-			subfile = download_subtitles(vidfile)
-			vidfile = embed_subs(vidfile, subfile)
+			subfile = download_subtitles(origvidfile)
+			subbedvidfile = embed_subs(origvidfile, subfile)
 		except:
 			bot.send_master_message(f'Failed to encode subs for {name}')
 		finally:
-			move_to_server(vidfile)
+			move_to_server(subbedvidfile)
+			os.remove(origvidfile)
 
 	bot.send_master_message(f'{name} has finished downloading')
 
