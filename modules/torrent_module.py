@@ -73,29 +73,26 @@ def main():
 	bot.send_master_message(f'{name} has been downloaded.')
 	
 	# only download subs for shows inside tvshows subdirectory
-	if Config().read('subs_download_directory') in base_path:
-		bot.send_master_message(f'Waiting for subs for {name}.')
+	bot.send_master_message(f'Waiting for subs for {name}.')
 
-		sleep(int(Config().read('subs_wait_period')))
-		
-		for path, _dirs, files in os.walk(base_path, topdown=False):
-			for vidfile in files:
-				if is_video(vidfile):
+	sleep(int(Config().read('subs_wait_period')))
+	
+	for path, _dirs, files in os.walk(base_path, topdown=False):
+		for vidfile in files:
+			if is_video(vidfile):
 
-					changedir(path)
+				changedir(path)
 
-					if get_audio_codec(vidfile) == 'eac3':
-						tmpvidfile = vidfile
-						vidfile = reencode_audio(vidfile)
-						os.remove(tmpvidfile)
+				if get_audio_codec(vidfile) == 'eac3':
+					tmpvidfile = vidfile
+					vidfile = reencode_audio(vidfile)
+					os.remove(tmpvidfile)
 
-					try:
-						subfile = download_subtitles(vidfile)
-						vidfile = embed_subs(vidfile, subfile)
-					except:
-						bot.send_master_message(f'Failed to encode subs for {vidfile}.')
-					finally:
-						move_to_server(vidfile)
+				try:
+					subfile = download_subtitles(vidfile)
+					vidfile = embed_subs(vidfile, subfile)
+				except:
+					bot.send_master_message(f'Failed to encode subs for {vidfile}.')
 
 		bot.send_master_message(f'{name} has finished being subbed.')
 
