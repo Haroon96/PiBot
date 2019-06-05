@@ -6,7 +6,8 @@ def add_command(cmd, action, info):
 
 
 def init_commands():
-	add_command('ytdl', commands.download_youtube_audio, 'Download audio from Youtube')
+	add_command('adl', commands.download_youtube_audio, 'Download audio from Youtube')
+	add_command('vdl', commands.download_youtube_video, 'Download video from Youtube')
 	add_command('rms', commands.reboot_media_server, 'Reboot MiniDLNA server')
 	add_command('status', commands.status_check, 'Check the status of the bot')
 	add_command('reboot', commands.reboot, 'Reboot the device')
