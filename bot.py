@@ -36,11 +36,14 @@ class Bot:
 		except:
 			return False
 
-	def send_message(self, msg, chat_id):
-		self.bot.sendMessage(msg, chat_id)
+	def send_message(self, msg, chat_id, msg_id=None, format=None):
+		self.bot.sendMessage(msg, chat_id, reply_to_message_id=msg_id, parse_mode=format)
 
 	def send_audio(self, audio, chat_id):
 		self.bot.sendAudio(audio, chat_id)
+	
+	def send_video(self, video, chat_id):
+		self.bot.sendVideo(audio, chat_id)
 
 	def send_master_message(self, msg):
 		self.send_message(Config().read('master_chat_id'), msg)
