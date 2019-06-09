@@ -4,9 +4,8 @@ from bot import Bot
 from config import Config
 
 def handler(message):
-	text = message['text']
 	chat_id = message['chat']['id']
-	interpret(text, chat_id)
+	interpret(message, chat_id)
 
 def main():
 	bot = Bot()
