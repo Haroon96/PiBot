@@ -42,7 +42,9 @@ def download_youtube_video(params, chat_id, msg_id):
 
 def reboot_media_server(params, chat_id, msg_id):
 	Bot().send_message(chat_id, 'Rebooting MiniDLNA server.', msg_id=msg_id)
-	os.popen("sudo -S minidlnad -R", 'w').write(Config().read('sudo_password'))
+	spass = Config().read('sudo_password')
+	os.popen("sudo -S minidlnad -R", 'w').write(spass)
+	os.popen("sudo -S service minidlna restart", 'w').write(spass)
 
 
 def status_check(params, chat_id, msg_id):
@@ -50,7 +52,7 @@ def status_check(params, chat_id, msg_id):
 
 def reboot(params, chat_id, msg_id):
 	Bot().send_message(chat_id, 'Rebooting...', msg_id=msg_id)
-	os.popen("sudo -S reboot", 'w').write(Config().read('sudo_password'))
+	os.popen("sudo -S shutdown -r", 'w').write(Config().read('sudo_password'))
 
 
 def update(params, chat_id, msg_id):
