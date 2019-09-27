@@ -35,6 +35,9 @@ def reboot_media_server(params, chat_id):
 	Bot().send_message(chat_id, 'Rebooting MiniDLNA server.')
 	os.popen("sudo -S minidlnad -R", 'w').write(Config().read('sudo_password'))
 
+def remount_hdd(params, chat_id):
+	Bot().send_message(chat_id, 'Remounting HDDs.')
+	os.popen("sudo -S mount -a", 'w').write(Config().read('sudo_password'))
 
 def status_check(params, chat_id):
 	Bot().send_message(chat_id, 'OK!')
