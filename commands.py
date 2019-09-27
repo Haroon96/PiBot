@@ -59,7 +59,7 @@ def reboot(params, chat_id, msg_id):
 def update(params, chat_id, msg_id):
 	Bot().send_message(chat_id, 'Pulling updates...', msg_id=msg_id)
 	remote_repo = Config().read('remote_repo')
-	subprocess.run(f'git pull {remote_repo}', shell=True)
+	subprocess.run(f'git pull --no-edit {remote_repo}', shell=True)
 	reboot(params, chat_id)
 
 
