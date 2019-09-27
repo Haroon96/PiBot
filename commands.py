@@ -55,19 +55,16 @@ def reboot(params, chat_id, msg_id):
 	Bot().send_message(chat_id, 'Rebooting...', msg_id=msg_id)
 	os.popen("sudo -S reboot", 'w').write(Config().read('sudo_password'))
 
-
 def update(params, chat_id, msg_id):
 	Bot().send_message(chat_id, 'Pulling updates...', msg_id=msg_id)
 	remote_repo = Config().read('remote_repo')
 	subprocess.run(f'git pull --no-edit {remote_repo}', shell=True)
-	reboot(params, chat_id)
-
+	reboot(params, chat_id, msg_id)
 
 def update_proxy(params, chat_id, msg_id):
 	Bot().send_message(chat_id, 'Updating proxy...', msg_id=msg_id)
 	_update_proxy()
-	reboot(params, chat_id)
-
+	reboot(params, chat_id, msg_id)
 
 def list_media_server(params, chat_id, msg_id):
 	response = ''
