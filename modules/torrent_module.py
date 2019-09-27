@@ -31,7 +31,7 @@ def download_subtitles(name):
 def get_media_server_path():
 	base_dir = Config().read('base_directory')
 	media_server_dir = Config().read('media_server_directory')
-	return base_dir + media_server_dir
+	return os.path.join(base_dir, media_server_dir)
 
 
 def move_to_server(filename):
