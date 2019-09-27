@@ -16,6 +16,7 @@ def init_commands():
 	add_command('pbd', commands.purge_base_directory, 'Clear base directory')
 	add_command('upx', commands.update_proxy, 'Fetch a new proxy')
 	add_command('qbt', commands.download_torrent, 'Download torrents using qBittorrent')
+	add_command('rhd', commands.remount_hdd, 'Remount attached HDDs')
 
 def generate_help():
 	ref = ''

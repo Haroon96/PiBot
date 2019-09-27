@@ -46,6 +46,9 @@ def reboot_media_server(params, chat_id, msg_id):
 	os.popen("sudo -S minidlnad -R", 'w').write(spass)
 	os.popen("sudo -S service minidlna restart", 'w').write(spass)
 
+def remount_hdd(params, chat_id):
+	Bot().send_message(chat_id, 'Remounting HDDs.')
+	os.popen("sudo -S mount -a", 'w').write(Config().read('sudo_password'))
 
 def status_check(params, chat_id, msg_id):
 	Bot().send_message(chat_id, 'OK!', msg_id=msg_id)
@@ -54,19 +57,16 @@ def reboot(params, chat_id, msg_id):
 	Bot().send_message(chat_id, 'Rebooting...', msg_id=msg_id)
 	os.popen("sudo -S shutdown -r", 'w').write(Config().read('sudo_password'))
 
-
 def update(params, chat_id, msg_id):
 	Bot().send_message(chat_id, 'Pulling updates...', msg_id=msg_id)
 	remote_repo = Config().read('remote_repo')
-	subprocess.run(f'git pull {remote_repo}', shell=True)
-	reboot(params, chat_id)
-
+	subprocess.run(f'git pull --no-edit {remote_repo}', shell=True)
+	reboot(params, chat_id, msg_id)
 
 def update_proxy(params, chat_id, msg_id):
 	Bot().send_message(chat_id, 'Updating proxy...', msg_id=msg_id)
 	_update_proxy()
-	reboot(params, chat_id)
-
+	reboot(params, chat_id, msg_id)
 
 def list_media_server(params, chat_id, msg_id):
 	response = ''
