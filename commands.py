@@ -6,6 +6,7 @@ from subprocess import PIPE
 from config import Config
 from bot import Bot
 import json
+from modules.music_module import embed_music_metadata
 from proxy_manager import update_proxy as _update_proxy
 
 
@@ -42,10 +43,12 @@ def download_youtube_video(params, chat_id, msg_id):
 
 def reboot_media_server(params, chat_id, msg_id):
 	Bot().send_message(chat_id, 'Rebooting MiniDLNA server.', msg_id=msg_id)
-	os.popen("sudo -S minidlnad -R", 'w').write(Config().read('sudo_password'))
+	spass = Config().read('sudo_password')
+	os.popen("sudo -S minidlnad -R", 'w').write(spass)
+	os.popen("sudo -S service minidlna restart", 'w').write(spass)
 
-def remount_hdd(params, chat_id):
-	Bot().send_message(chat_id, 'Remounting HDDs.')
+def remount_hdd(params, chat_id, msg_id):
+	Bot().send_message(chat_id, 'Remounting HDDs.', msg_id=msg_id)
 	os.popen("sudo -S mount -a", 'w').write(Config().read('sudo_password'))
 
 def status_check(params, chat_id, msg_id):
@@ -53,7 +56,7 @@ def status_check(params, chat_id, msg_id):
 
 def reboot(params, chat_id, msg_id):
 	Bot().send_message(chat_id, 'Rebooting...', msg_id=msg_id)
-	os.popen("sudo -S reboot", 'w').write(Config().read('sudo_password'))
+	os.popen("sudo -S shutdown -r", 'w').write(Config().read('sudo_password'))
 
 def update(params, chat_id, msg_id):
 	Bot().send_message(chat_id, 'Pulling updates...', msg_id=msg_id)
