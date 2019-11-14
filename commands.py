@@ -31,7 +31,7 @@ def get_youtube_output_format():
 
 def download_youtube_audio(params, chat_id, msg_id):
 	Bot().send_message(chat_id, "Starting download...", msg_id=msg_id)
-	process = subprocess.run(f'youtube-dl -o {get_youtube_output_format()} -x --audio-format mp3 --audio-quality 320k --embed-thumbnail --restrict-filenames --print-json {params}', shell=True, stdout=PIPE)
+	process = subprocess.run(f'youtube-dl -o {get_youtube_output_format()} -x --audio-format mp3 --audio-quality 320k --restrict-filenames --print-json {params}', shell=True, stdout=PIPE)
 	js = json.loads(process.stdout.decode())
 	embed_music_metadata(js['title'].replace('_', ' '), f"{os.path.splitext(js['_filename'])[0]}.mp3")
 	send_youtube_link(chat_id, msg_id, js, replace_ext='mp3', sub='(AUDIO)')
