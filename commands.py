@@ -6,6 +6,7 @@ from subprocess import PIPE
 from config import Config
 from bot import Bot
 import json
+from modules.music_module import embed_music_metadata
 from proxy_manager import update_proxy as _update_proxy
 
 

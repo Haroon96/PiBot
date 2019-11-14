@@ -1,1 +1,14 @@
-{"use_proxy": "", "proxy_url": "", "master_chat_id": "", "bot_token": "", "sudo_password": "", "base_directory": "", "media_server_directory": "", "ytdl_directory": "", "media_http_url": "", "subs_wait_period": "", "remote_repo": ""}
+{ 
+    "use_proxy":"",
+    "proxy_url":"",
+    "master_chat_id":"",
+    "bot_token":"",
+    "sudo_password":"",
+    "base_directory":"",
+    "media_server_directory":"",
+    "ytdl_directory":"",
+    "media_http_url":"",
+    "subs_wait_period":"",
+    "remote_repo":"",
+    "genius_api_token":""
+ }
