@@ -28,7 +28,7 @@ def embed_music_metadata(title, filename):
         audio_file.tag.title = music_info['title']
         audio_file.tag.artist = music_info['primary_artist']['name']
         audio_file.tag.album = music_info['album']['name']
-        audio_file.tag.images.set(3, art.raw.read(), 'image/jpeg')
+        audio_file.tag.images.set(3, art.raw.read(), 'image/jpeg', '"Album Cover"')
 
         audio_file.tag.save()
 
