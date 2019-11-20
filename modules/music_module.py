@@ -1,8 +1,9 @@
 from bs4 import BeautifulSoup
 from googlesearch import search as gsearch
-#from config import Config
+from config import Config
 import requests
-import eyed3
+from mutagen.mp3 import MP3
+from mutagen.id3 import TIT2, TPE1, TALB, TPE2, USLT, APIC
 import sys
 import os
 import re
@@ -21,7 +22,7 @@ def find_genius_data(title):
         # get lyrics
         lyrics = ''
         try:
-            lyrics = BeautifulSoup(html, 'html.parser').find('div', attrs={'class': 'lyrics'}).text
+            lyrics = BeautifulSoup(html, 'html.parser').find('div', attrs={'class': 'lyrics'}).text.strip()
         except Exception as e:
             print("Failed to fetch lyrics:", e)
             pass
@@ -54,15 +55,16 @@ def embed_music_metadata(title, filename):
         music_info = get_music_info(title)
         art = requests.get(get_cover_art_url(music_info), stream=True)
 
-        audio_file = eyed3.load(filename)
+        mp3 = MP3(filename)
 
-        audio_file.tag.title = music_info['title']
-        audio_file.tag.artist = music_info['primary_artist']['name']
-        audio_file.tag.album = music_info['album']['name']
-        audio_file.tag.lyrics.set(music_info['lyrics'])
-        audio_file.tag.images.set(3, art.raw.read(), 'image/jpeg', '"Album Cover"')
+        mp3['TIT2'] = TIT2(encoding=3, text=[music_info['title']])
+        mp3['TPE1'] = TPE1(encoding=3, text=[music_info['primary_artist']['name']])
+        mp3['TALB'] = TALB(encoding=3, text=[music_info['album']['name']])
+        mp3['TPE2'] = TPE2(encoding=3, text=[music_info['album']['artist']['name']])
+        mp3['USLT::XXX'] = USLT(encoding=1, lang='XXX', desc='', text=music_info['lyrics'])
+        mp3['APIC:'] = APIC(encoding=3, mime="image/jpeg", type=3, desc='', data=art.raw.read())
 
-        audio_file.tag.save()
+        mp3.save()
 
     except Exception as e:
         print(f"Failed to encode music data for title: {title}", e)
