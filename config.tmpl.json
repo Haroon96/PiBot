@@ -10,5 +10,6 @@
     "media_http_url":"",
     "subs_wait_period":"",
     "remote_repo":"",
-    "genius_api_token":""
+    "genius_api_token":"",
+    "thread_limit":""
  }
