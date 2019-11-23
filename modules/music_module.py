@@ -1,14 +1,14 @@
-from bs4 import BeautifulSoup
-from googlesearch import search as gsearch
-import requests
-from mutagen.mp3 import MP3
-from mutagen.id3 import TIT2, TPE1, TALB, TPE2, USLT, APIC, TCON
 import sys
-sys.path.append('/home/haroon/Desktop/PiBot')
-from config import Config
 import os
 import re
 import json
+import requests
+from bs4 import BeautifulSoup
+from googlesearch import search as gsearch
+from mutagen.mp3 import MP3
+from mutagen.id3 import TIT2, TPE1, TALB, TPE2, USLT, APIC, TCON
+from pathvalidate import sanitize_filename
+from config import Config
 
 def find_genius_data(title):
     # get top google result
@@ -58,23 +58,36 @@ def get_cover_art_url(music_info):
 def get_title(music_info):
     return music_info['title_with_featured'].replace('Ft.', 'feat.')
 
+def rename_file(title, artist, oldfilepath):
+    basepath, oldname = os.path.split(filepath)
+    _, ext = os.path.splitext(oldname)
+    newname = sanitize_filename(f'{artist} - {title}.{ext}')
+    newfilepath = os.path.join(basepath, newname)
+    os.rename(oldfilepath, newfilepath)
+    return newfilepath
+
 def embed_music_metadata(title, filename):
     try:
 
         music_info = get_music_info(title)
-        art = requests.get(get_cover_art_url(music_info), stream=True)
+        artwork = requests.get(get_cover_art_url(music_info), stream=True)
 
         mp3 = MP3(filename)
 
-        mp3['TIT2'] = TIT2(encoding=3, text=[get_title(music_info)])
-        mp3['TPE1'] = TPE1(encoding=3, text=[music_info['primary_artist']['name']])
+        title = get_title(music_info)
+        artist = music_info['primary_artist']['name']
+
+        mp3['TIT2'] = TIT2(encoding=3, text=[title])
+        mp3['TPE1'] = TPE1(encoding=3, text=[artist])
         mp3['TALB'] = TALB(encoding=3, text=[music_info['album']['name']])
         mp3['TPE2'] = TPE2(encoding=3, text=[music_info['album']['artist']['name']])
         mp3['TCON'] = TCON(encoding=3, text=[music_info['genre']])
         mp3['USLT::XXX'] = USLT(encoding=1, lang='XXX', desc='', text=music_info['lyrics'])
-        mp3['APIC:'] = APIC(encoding=3, mime="image/jpeg", type=3, desc='', data=art.raw.read())
+        mp3['APIC:'] = APIC(encoding=3, mime="image/jpeg", type=3, desc='', data=artwork.raw.read())
 
         mp3.save()
+
+        return rename_file(title, artist, filename)
 
     except Exception as e:
         print(f"Failed to encode music data for title: {title}", e)
