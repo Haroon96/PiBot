@@ -57,13 +57,13 @@ def get_cover_art_url(music_info):
     return music_info['song_art_image_url']
 
 def get_title(music_info):
-    return music_info['title_with_featured'].replace('Ft.', 'feat.')
+    title = music_info['title_with_featured'].replace('Ft.', 'feat.')
+    return unicodedata.normalize('NFKD', title)
 
 def rename_file(title, artist, oldfilepath):
     basepath, oldname = os.path.split(oldfilepath)
     _, ext = os.path.splitext(oldname)
     newname = sanitize_filename(f'{artist} - {title}{ext}')
-    newname = unicodedata.normalize('AFKD', newname)
     newfilepath = os.path.join(basepath, newname)
     os.rename(oldfilepath, newfilepath)
     return newfilepath
