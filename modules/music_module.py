@@ -93,3 +93,5 @@ def embed_music_metadata(title, filename):
 
     except Exception as e:
         print(f"Failed to encode music data for title: {title}", e)
+
+    return title, filename
