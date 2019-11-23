@@ -3,6 +3,7 @@ import os
 import re
 import json
 import requests
+import unicodedata
 from bs4 import BeautifulSoup
 from googlesearch import search as gsearch
 from mutagen.mp3 import MP3
@@ -59,9 +60,10 @@ def get_title(music_info):
     return music_info['title_with_featured'].replace('Ft.', 'feat.')
 
 def rename_file(title, artist, oldfilepath):
-    basepath, oldname = os.path.split(filepath)
+    basepath, oldname = os.path.split(oldfilepath)
     _, ext = os.path.splitext(oldname)
-    newname = sanitize_filename(f'{artist} - {title}.{ext}')
+    newname = sanitize_filename(f'{artist} - {title}{ext}')
+    newname = unicodedata.normalize('AFKD', newname)
     newfilepath = os.path.join(basepath, newname)
     os.rename(oldfilepath, newfilepath)
     return newfilepath
