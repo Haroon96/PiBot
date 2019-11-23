@@ -10,7 +10,7 @@ from modules.music_module import embed_music_metadata
 from proxy_manager import update_proxy as _update_proxy
 
 
-def send_youtube_link(chat_id, msg_id, js, replace_ext=None, sub=''):
+def send_youtube_link(chat_id, msg_id, js, replace_ext=None):
 	title = js['title']
 	filename = js['_filename']
 	if replace_ext is not None:
@@ -19,8 +19,8 @@ def send_youtube_link(chat_id, msg_id, js, replace_ext=None, sub=''):
 	base_dir = config.read('base_directory')
 	http_url = config.read('media_http_url')
 	rpath = filename.replace(base_dir, '')
-	msg = f'[{title} {sub}]({http_url}{rpath})'
-	Bot().send_message(chat_id, msg, msg_id=msg_id, format='Markdown')
+	msg = f'<a href="{http_url}{rpath}">{title}</a>'
+	Bot().send_message(chat_id, msg, msg_id=msg_id, format='HTML')
 
 def get_youtube_output_format():
 	config = Config()
@@ -33,15 +33,21 @@ def download_youtube_audio(params, chat_id, msg_id):
 	Bot().send_message(chat_id, "Starting download...", msg_id=msg_id)
 	process = subprocess.run(f'youtube-dl -o {get_youtube_output_format()} -x --audio-format mp3 --audio-quality 320k --restrict-filenames --print-json {params}', shell=True, stdout=PIPE)
 	js = json.loads(process.stdout.decode())
-	newfile = embed_music_metadata(js['title'].replace('_', ' '), f"{os.path.splitext(js['_filename'])[0]}.mp3")
-	js['_filename'] = newfile
-	send_youtube_link(chat_id, msg_id, js, replace_ext='mp3', sub='(AUDIO)')
+	# get title and filename from youtube-dl
+	title = js['title']
+	filename = f"{os.path.splitext(js['_filename'])[0]}.mp3"
+	# update title and filename from metadata
+	title, filename = embed_music_metadata(title, filename)
+	# replace original json values
+	js['title'] = title
+	js['_filename'] = filename
+	send_youtube_link(chat_id, msg_id, js, replace_ext='mp3')
 
 def download_youtube_video(params, chat_id, msg_id):
 	Bot().send_message(chat_id, "Starting download...", msg_id=msg_id)
 	process = subprocess.run(f'youtube-dl -o {get_youtube_output_format()} --recode-video mkv --print-json --restrict-filenames {params}', stdout=PIPE, shell=True)
 	js = json.loads(process.stdout.decode())
-	send_youtube_link(chat_id, msg_id, js, replace_ext='mkv', sub='(VIDEO)')
+	send_youtube_link(chat_id, msg_id, js, replace_ext='mkv')
 
 def reboot_media_server(params, chat_id, msg_id):
 	Bot().send_message(chat_id, 'Rebooting MiniDLNA server.', msg_id=msg_id)

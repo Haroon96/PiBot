@@ -89,7 +89,7 @@ def embed_music_metadata(title, filename):
 
         mp3.save()
 
-        return rename_file(title, artist, filename)
+        return f'{artist} - {title}', rename_file(title, artist, filename)
 
     except Exception as e:
         print(f"Failed to encode music data for title: {title}", e)
