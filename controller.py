@@ -34,11 +34,11 @@ def start_thread(method, args):
 	Thread(target=run_command, args=(method, args,)).start()
 
 def interpret(msg, chat_id):
-	args = msg['text'].split(' ')
+	args = msg['text'].split()
 
 	cmd = args[0].lower()
 	msg_id = msg['message_id']
-	params = ''.join(args[1:])
+	params = ' '.join(args[1:])
 
 	if cmd in command_dict:
 		start_thread(command_dict[cmd]['action'], (params, chat_id, msg_id))

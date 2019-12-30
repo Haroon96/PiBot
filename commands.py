@@ -31,17 +31,18 @@ def get_youtube_output_format():
 
 def download_youtube_audio(params, chat_id, msg_id):
 	Bot().send_message(chat_id, "Starting download...", msg_id=msg_id)
-	process = subprocess.run(f'youtube-dl -o {get_youtube_output_format()} -x --audio-format mp3 --audio-quality 320k --restrict-filenames --print-json {params}', shell=True, stdout=PIPE)
-	js = json.loads(process.stdout.decode())
-	# get title and filename from youtube-dl
-	title = js['title']
-	filename = f"{os.path.splitext(js['_filename'])[0]}.mp3"
-	# update title and filename from metadata
-	title, filename = embed_music_metadata(title, filename)
-	# replace original json values
-	js['title'] = title
-	js['_filename'] = filename
-	send_youtube_link(chat_id, msg_id, js, replace_ext='mp3')
+	for link in params.split():
+		process = subprocess.run(f'youtube-dl -o {get_youtube_output_format()} -x --audio-format mp3 --audio-quality 320k --restrict-filenames --print-json {link}', shell=True, stdout=PIPE)
+		js = json.loads(process.stdout.decode())
+		# get title and filename from youtube-dl
+		title = js['title']
+		filename = f"{os.path.splitext(js['_filename'])[0]}.mp3"
+		# update title and filename from metadata
+		title, filename = embed_music_metadata(title, filename)
+		# replace original json values
+		js['title'] = title
+		js['_filename'] = filename
+		send_youtube_link(chat_id, msg_id, js, replace_ext='mp3')
 
 def download_youtube_video(params, chat_id, msg_id):
 	Bot().send_message(chat_id, "Starting download...", msg_id=msg_id)
