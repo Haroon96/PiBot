@@ -52,9 +52,14 @@ def get_music_info(q):
     return js
 
 def get_cover_art_url(music_info):
-    if 'cover_art_url' in music_info['album']:
+    if music_info['album'] is not None:
         return music_info['album']['cover_art_url']
     return music_info['song_art_image_url']
+
+def get_album_info(music_info):
+    if music_info['album'] is not None:
+        return (music_info['album']['name'], music_info['album']['artist']['name'])
+    return (f"{music_info['title']} - Single", music_info['primary_artist']['name'])
 
 def get_title(music_info):
     title = music_info['title_with_featured'].replace('Ft.', 'feat.')
@@ -72,7 +77,6 @@ def embed_music_metadata(title, filename):
     try:
 
         music_info = get_music_info(title)
-        artwork = requests.get(get_cover_art_url(music_info), stream=True)
 
         mp3 = MP3(filename)
 
@@ -81,11 +85,19 @@ def embed_music_metadata(title, filename):
 
         mp3['TIT2'] = TIT2(encoding=3, text=[title])
         mp3['TPE1'] = TPE1(encoding=3, text=[artist])
-        mp3['TALB'] = TALB(encoding=3, text=[music_info['album']['name']])
-        mp3['TPE2'] = TPE2(encoding=3, text=[music_info['album']['artist']['name']])
+
+        album_name, album_artist = get_album_info(music_info)
+        mp3['TALB'] = TALB(encoding=3, text=[album_name])
+        mp3['TPE2'] = TPE2(encoding=3, text=[album_artist])
+
         mp3['TCON'] = TCON(encoding=3, text=[music_info['genre']])
         mp3['USLT::XXX'] = USLT(encoding=1, lang='XXX', desc='', text=music_info['lyrics'])
-        mp3['APIC:'] = APIC(encoding=3, mime="image/jpeg", type=3, desc='', data=artwork.raw.read())
+
+        try:
+            artwork = requests.get(get_cover_art_url(music_info), stream=True)
+            mp3['APIC:'] = APIC(encoding=3, mime="image/jpeg", type=3, desc='', data=artwork.raw.read())
+        except Exception as e:
+            print(f"Failed to embed artwork for title: {title}", e)
 
         mp3.save()
 
