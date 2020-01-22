@@ -11,10 +11,14 @@ from mutagen.id3 import TIT2, TPE1, TALB, TPE2, USLT, APIC, TCON
 from pathvalidate import sanitize_filename
 from config import Config
 
-def find_genius_data(title):
-    # get top google result
-    search_result = gsearch(f'site:genius.com {title}', stop=1)
-    for url in search_result:
+def find_genius_data(title, genius_url):
+    urls = [genius_url]
+
+    # get top google result is no genius_url provided
+    if genius_url is None:
+        urls = gsearch(f'site:genius.com {title}', stop=1)
+
+    for url in urls:
         r = requests.get(url)
         html = r.text
         
@@ -35,12 +39,12 @@ def find_genius_data(title):
             
         return (song_id, lyrics, genre)
         
-def get_music_info(q):
+def get_music_info(q, genius_url):
     token = Config().read('genius_api_token')
     headers = {'Authorization': f'Bearer {token}'}
     
     # search for song
-    song_id, lyrics, genre = find_genius_data(q)
+    song_id, lyrics, genre = find_genius_data(q, genius_url)
 
     # search song metadata
     r = requests.get(f'https://api.genius.com/songs/{song_id}', headers=headers)
@@ -73,10 +77,10 @@ def rename_file(title, artist, oldfilepath):
     os.rename(oldfilepath, newfilepath)
     return newfilepath
 
-def embed_music_metadata(title, filename):
+def embed_music_metadata(title, filename, genius_url=None):
     try:
 
-        music_info = get_music_info(title)
+        music_info = get_music_info(title, genius_url)
 
         mp3 = MP3(filename)
 

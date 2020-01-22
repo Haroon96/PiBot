@@ -32,13 +32,16 @@ def get_youtube_output_format():
 def download_youtube_audio(params, chat_id, msg_id):
 	Bot().send_message(chat_id, "Starting download...", msg_id=msg_id)
 	for link in params.split():
+		genius_url = None
+		if '|' in link:
+			link, genius_url = link.split('|')
 		process = subprocess.run(f'youtube-dl -o {get_youtube_output_format()} -x --audio-format mp3 --audio-quality 320k --restrict-filenames --print-json {link}', shell=True, stdout=PIPE)
 		js = json.loads(process.stdout.decode())
 		# get title and filename from youtube-dl
 		title = js['title']
 		filename = f"{os.path.splitext(js['_filename'])[0]}.mp3"
 		# update title and filename from metadata
-		title, filename = embed_music_metadata(title, filename)
+		title, filename = embed_music_metadata(title, filename, genius_url)
 		# replace original json values
 		js['title'] = title
 		js['_filename'] = filename
