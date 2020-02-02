@@ -1,13 +1,14 @@
 from bot import Bot
 import commands
-from threading import Thread
+from config import Config
+from threading import Thread, Semaphore
 
 def add_command(cmd, action, info):
 	command_dict[cmd] = {'action': action, 'info': info}
 
 def init_commands():
-	add_command('adl', commands.download_youtube_audio, 'Download audio from Youtube')
-	add_command('vdl', commands.download_youtube_video, 'Download video from Youtube')
+	add_command('mdl', commands.download_youtube_audio, 'Download music from YouTube')
+	add_command('vdl', commands.download_youtube_video, 'Download video from YouTube')
 	add_command('rms', commands.reboot_media_server, 'Reboot MiniDLNA server')
 	add_command('status', commands.status_check, 'Check the status of the bot')
 	add_command('reboot', commands.reboot, 'Reboot the device')
@@ -24,23 +25,30 @@ def generate_help():
 		ref += f"`{cmd}`: {command_dict[cmd]['info']}\n\n"
 	return ref
 
-def mkthread(method, args):
-	Thread(target=method, args=args).start()
+def run_command(method, args):
+	semaphore.acquire()
+	method(*args)
+	semaphore.release()
+
+def start_thread(method, args):
+	Thread(target=run_command, args=(method, args,)).start()
 
 def interpret(msg, chat_id):
-	args = msg['text'].split(' ')
+	args = msg['text'].split()
 
 	cmd = args[0].lower()
 	msg_id = msg['message_id']
-	params = ''.join(args[1:])
+	params = ' '.join(args[1:])
 
-	if cmd == 'help':
-		mkthread(Bot().send_message, (chat_id, generate_help(),))
-	elif cmd in command_dict:
-		mkthread(command_dict[cmd]['action'], (params, chat_id, msg_id))
+	if cmd in command_dict:
+		start_thread(command_dict[cmd]['action'], (params, chat_id, msg_id))
 	else:
-		mkthread(Bot().send_message, (chat_id, "Unrecognized command",))
-
-
+		# unrecognized command, send help prompt 
+		start_thread(Bot().send_message, (chat_id, generate_help(),))
+	
+# init commands
 command_dict = {}
 init_commands()
+
+# init semaphore
+semaphore = Semaphore(Config().read('thread_limit'))

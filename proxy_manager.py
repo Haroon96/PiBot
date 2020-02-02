@@ -45,3 +45,6 @@ def update_proxy():
 			config.save()
 			return proxy
 	return ''
+
+if __name__ == "__main__":
+	update_proxy()
