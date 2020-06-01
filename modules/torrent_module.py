@@ -40,8 +40,12 @@ def move_to_server(filename):
 
 def embed_subs(vidfile, subfile):
 	outfile = vidfile[:-4] + "[SUBBED].mkv"
-	subprocess.run(["ffmpeg", "-i", vidfile, "-i", subfile,
+	p = subprocess.run(["ffmpeg", "-i", vidfile, "-i", subfile,
 					"-c", "copy", "-c:s", "srt", outfile])
+	
+	if p.returncode != 0:
+		raise Exception('Embed failed')
+
 	return outfile
 
 
@@ -91,11 +95,9 @@ def main():
 				try:
 					subfile = download_subtitles(vidfile)
 					vidfile = embed_subs(vidfile, subfile)
+					bot.send_master_message(f'Successfully encoded subs for {vidfile}.')
 				except:
 					bot.send_master_message(f'Failed to encode subs for {vidfile}.')
-
-		bot.send_master_message(f'{name} has finished being subbed.')
-
 
 if __name__ == "__main__":
 	changedir()
