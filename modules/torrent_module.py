@@ -8,20 +8,25 @@ from time import sleep
 from babelfish import Language
 from subliminal import Video, download_best_subtitles, save_subtitles
 
-def changedir(path=0):
-	if (path == 0):
+def changedir(path=None):
+	if path is None:
+		# move to directory of the script file to allow imports
 		path = os.path.realpath(__file__)
-		path = path[:path.rindex("/")]
+		# __file__ contains file name too, only fetch the base path
+		path = os.path.split(path)[0]
 	os.chdir(path)
 
 
 def parse_args(argv):
-	path = " ".join(argv[1:])
-	name = path[path.rindex('/') + 1:]
+	# get path from arguments
+	path = argv[1]
+	# extract torrent name from path (basename of path)
+	name = os.path.basename(os.path.normpath(path))
 	return name, path
 
 
 def download_subtitles(name):
+	# download subtitles using subliminal
 	v = Video.fromname(name)
 	subs = download_best_subtitles([v], {Language("eng")})
 	save_subtitles(v, subs[v])
@@ -29,17 +34,18 @@ def download_subtitles(name):
 
 
 def get_media_server_path():
-	base_dir = Config().read('base_directory')
-	media_server_dir = Config().read('media_server_directory')
+	# build media_server_path and return
+	base_dir = config.read('base_directory')
+	media_server_dir = config.read('media_server_directory')
 	return os.path.join(base_dir, media_server_dir)
 
 
-def move_to_server(filename):
-	shutil.move(filename, f'{ get_media_server_path() }/{ filename }')
-
-
 def encode_subs(vidfile, subfile):
-	outfile = vidfile[:-4] + "[SUBBED].mkv"
+	# extract filename and extension from vidfile
+	filename, ext = os.path.splitext(vidfile)
+	# build new filename
+	outfile = f"{filename}[SUBBED].mkv"
+	# use ffmpeg to encode subtitles
 	p = subprocess.run(["ffmpeg", "-i", vidfile, "-i", subfile,
 					"-c", "copy", "-c:s", "srt", outfile])
 	
@@ -50,21 +56,23 @@ def encode_subs(vidfile, subfile):
 
 
 def is_video(f):
-	exts = ['.mkv', '.mp4', '.avi', '.m4v']
-	for e in exts:
-		if f.endswith(e):
-			return True
-	return False
+	_, ext = os.path.splitext(f)
+	return ext in ['.mkv', '.mp4', '.avi', '.m4v']
 
 
 def reencode_audio(vidfile):
-	outfile = vidfile[:-4] + "[RENC].mkv"
+	# extract filename and extension from vidfile
+	filename, ext = os.path.splitext(vidfile)
+	# build new filename
+	outfile = f"{filename}[RENC].mkv"
+	# use ffmpeg to re-encode audio
 	subprocess.run(["ffmpeg", "-i", vidfile, "-c:v",
 					"copy", "-c:a", "ac3", outfile])
 	return outfile
 
 
 def get_audio_codec(vidfile):
+	# get name of audio codec
 	out = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a:0", "-show_entries",
 						  "stream=codec_name", "-of", "default=noprint_wrappers=1:nokey=1", vidfile], stdout=PIPE).stdout
 	return out.decode().strip()
@@ -93,7 +101,7 @@ def main():
 
 	# inform user and wait for subs_wait_period
 	bot.send_master_message(f'Waiting for subs for {name}.')
-	sleep_for = int(Config().read('subs_wait_period'))
+	sleep_for = int(config.read('subs_wait_period'))
 	sleep(sleep_for)
 	
 	# for each video in the download path
@@ -124,9 +132,14 @@ def main():
 			bot.send_master_message(f'Failed to encode subs for {vidfile}.')
 
 if __name__ == "__main__":
+	# move to script dir to allow local imports
 	changedir()
 	sys.path.append('../')
 	from bot import Bot
 	from config import Config
+
+	# create a new global config object
+	global config
+	config = config
 	
 	main()
