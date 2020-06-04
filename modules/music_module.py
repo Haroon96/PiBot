@@ -19,12 +19,21 @@ def find_genius_data(title, genius_url):
         urls = gsearch(f'site:genius.com {title}', stop=1)
 
     for url in urls:
-        r = requests.get(url)
-        html = r.text
-        
-        # get song_id
-        key = re.search(r'"Song ID":[0-9]+', html).group()
-        song_id = re.search(r'[0-9]+', key).group()
+
+        # retry 10 times
+        for _ in range(10):
+            r = requests.get(url)
+            html = r.text
+            
+            # get song_id
+            key = re.search(r'"Song ID":[0-9]+', html)
+            # if key is None, there was an issue in the call - try again
+            if key is None:
+                continue
+            # extract song_id
+            key = key.group()
+            song_id = re.search(r'[0-9]+', key).group()
+            break
 
         # get lyrics
         lyrics = ''
