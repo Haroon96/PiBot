@@ -27,9 +27,7 @@ def parse_args(argv):
 
 def download_subtitles(name):
 	# download subtitles using subliminal
-	v = Video.fromname(name)
-	subs = download_best_subtitles([v], {Language("eng")})
-	save_subtitles(v, subs[v])
+	subprocess.run(['subliminal', 'download', name, '-l', 'en'])
 	return f"{os.path.splitext(name)[0]}.en.srt"
 
 
