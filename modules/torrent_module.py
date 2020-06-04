@@ -38,13 +38,13 @@ def move_to_server(filename):
 	shutil.move(filename, f'{ get_media_server_path() }/{ filename }')
 
 
-def embed_subs(vidfile, subfile):
+def encode_subs(vidfile, subfile):
 	outfile = vidfile[:-4] + "[SUBBED].mkv"
 	p = subprocess.run(["ffmpeg", "-i", vidfile, "-i", subfile,
 					"-c", "copy", "-c:s", "srt", outfile])
 	
 	if p.returncode != 0:
-		raise Exception('Embed failed')
+		raise Exception('Subs encoding failed')
 
 	return outfile
 
@@ -71,37 +71,62 @@ def get_audio_codec(vidfile):
 
 
 def main():
-	name, base_path = parse_args(sys.argv)
+
+	# get location of download
+	name, root_path = parse_args(sys.argv)
+
 	bot = Bot()
-
+	
+	# inform user that the torrent has downloaded
 	bot.send_master_message(f'{name} has been downloaded.')
-	
-	# only download subs for shows inside tvshows subdirectory
+
+	# search for videos in the download path
+	videos = []
+	for path, _dirs, files in os.walk(root_path, topdown=False):
+		for f in files:
+			if is_video(f):
+				videos.append(f)
+
+	# end program if there are no videos in the download
+	if len(videos) == 0:
+		return
+
+	# inform user and wait for subs_wait_period
 	bot.send_master_message(f'Waiting for subs for {name}.')
-
-	sleep(int(Config().read('subs_wait_period')))
+	sleep_for = int(Config().read('subs_wait_period'))
+	sleep(sleep_for)
 	
-	for path, _dirs, files in os.walk(base_path, topdown=False):
-		for vidfile in files:
-			if is_video(vidfile):
+	# for each video in the download path
+	for vidfile in videos:
 
-				changedir(path)
+		# change to video dir
+		changedir(path)
 
-				if get_audio_codec(vidfile) == 'eac3':
-					tmpvidfile = vidfile
-					vidfile = reencode_audio(vidfile)
-					os.remove(tmpvidfile)
+		# if the audio is eac3, re-encode to ac3
+		# eac3 is generally unsupported by Sony Bravia devices
+		if get_audio_codec(vidfile) == 'eac3':
+			# save original file name
+			tmpvidfile = vidfile
+			# re-encode audio to ac3 and update file name
+			vidfile = reencode_audio(vidfile)
+			# delete original file
+			os.remove(tmpvidfile)
 
-				try:
-					subfile = download_subtitles(vidfile)
-					vidfile = embed_subs(vidfile, subfile)
-					bot.send_master_message(f'Successfully encoded subs for {vidfile}.')
-				except:
-					bot.send_master_message(f'Failed to encode subs for {vidfile}.')
+		try:
+			# download subtitles for the video using subliminal
+			subfile = download_subtitles(vidfile)
+			# encode subs into the video file using ffmpeg
+			vidfile = encode_subs(vidfile, subfile)
+			# inform user of successful encoding
+			bot.send_master_message(f'Successfully encoded subs for {vidfile}.')
+		except:
+			# inform user of failure
+			bot.send_master_message(f'Failed to encode subs for {vidfile}.')
 
 if __name__ == "__main__":
 	changedir()
 	sys.path.append('../')
 	from bot import Bot
 	from config import Config
+	
 	main()
