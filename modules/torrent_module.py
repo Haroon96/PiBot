@@ -140,6 +140,6 @@ if __name__ == "__main__":
 
 	# create a new global config object
 	global config
-	config = config
+	config = Config()
 	
 	main()
