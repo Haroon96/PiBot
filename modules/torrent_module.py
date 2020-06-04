@@ -30,7 +30,7 @@ def download_subtitles(name):
 	v = Video.fromname(name)
 	subs = download_best_subtitles([v], {Language("eng")})
 	save_subtitles(v, subs[v])
-	return f"{name[:-4]}.en.srt"
+	return f"{os.path.splitext(name)[0]}.en.srt"
 
 
 def get_media_server_path():
@@ -121,7 +121,7 @@ def main():
 			os.remove(tmpvidfile)
 
 		try:
-			# download subtitles for the video using subliminal
+			# download subtitles for the video
 			subfile = download_subtitles(vidfile)
 			# encode subs into the video file using ffmpeg
 			vidfile = encode_subs(vidfile, subfile)
