@@ -6,8 +6,8 @@ from subprocess import PIPE
 from config import Config
 from bot import Bot
 import json
-from modules.music_module import embed_music_metadata
 from proxy_manager import update_proxy as _update_proxy
+from gtagger import gTagger
 
 config = Config()
 
@@ -41,8 +41,9 @@ def download_youtube_audio(params, chat_id, msg_id):
 		filename = f"{os.path.splitext(js['_filename'])[0]}.mp3"
 
 		# update title and filename from metadata
-		if config.read('genius_api_token') != None:
-			title, filename = embed_music_metadata(title, filename, genius_url)
+		genius_token = config.read('genius_api_token')
+		if genius_token != None:
+			title, filename  = gTagger(genius_token).embed_song_metadata(title, filename, genius_url)
 
 		# replace original json values
 		js['title'] = title
