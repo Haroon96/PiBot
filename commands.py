@@ -43,7 +43,7 @@ def download_youtube_audio(params, chat_id, msg_id):
 		# update title and filename from metadata
 		genius_token = config.read('genius_api_token')
 		if genius_token != None:
-			title, filename  = gTagger(genius_token).embed_song_metadata(title, filename, genius_url)
+			title, filename  = gTagger(genius_token).tag(title, filename, genius_url)
 
 		# replace original json values
 		js['title'] = title
