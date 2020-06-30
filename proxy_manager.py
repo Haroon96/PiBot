@@ -19,13 +19,13 @@ def generate_proxies():
 
 	for i in proxy_list:
 		proxy = i.findAll('td')
-		protocol = "http"
-		if proxy[6].text == "yes":
-			protocol = "https"
+		# discard non-https proxies
+		if proxy[6].text != "yes":
+			continue
 		ip = proxy[0].text
 		port = proxy[1].text
 
-		yield protocol + "://" + ip + ":" + port
+		yield "https://" + ip + ":" + port
 
 
 def test_proxy(proxy_url):
