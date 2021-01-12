@@ -11,5 +11,6 @@
     "subs_wait_period":"",
     "remote_repo":"",
     "genius_api_token":"",
-    "thread_limit":""
+    "thread_limit":"",
+    "admin_chat_ids": []
  }
