@@ -84,9 +84,7 @@ def main():
 				changedir(path)
 
 				if get_audio_codec(vidfile) == 'eac3':
-					tmpvidfile = vidfile
 					vidfile = reencode_audio(vidfile)
-					os.remove(tmpvidfile)
 
 				try:
 					subfile = download_subtitles(vidfile)
