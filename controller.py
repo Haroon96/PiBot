@@ -19,7 +19,7 @@ def init_commands():
 	add_command('lms', commands.list_media_server, 'List the media available in media server directory')
 	add_command('pbd', commands.purge_base_directory, 'Clear base directory', True)
 	add_command('qbt', commands.download_torrent, 'Download torrents using qBittorrent')
-	add_command('upx', commands.update_proxy, 'Fetch a new proxy')
+	add_command('upx', commands.update_proxy, 'Fetch a new proxy', True)
 
 def generate_help():
 	ref = ''

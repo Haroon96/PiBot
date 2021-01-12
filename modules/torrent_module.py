@@ -8,96 +8,136 @@ from time import sleep
 from babelfish import Language
 from subliminal import Video, download_best_subtitles, save_subtitles
 
-def changedir(path=0):
-	if (path == 0):
+def changedir(path=None):
+	if path is None:
+		# move to directory of the script file to allow imports
 		path = os.path.realpath(__file__)
-		path = path[:path.rindex("/")]
+		# __file__ contains file name too, only fetch the base path
+		path = os.path.split(path)[0]
 	os.chdir(path)
 
 
 def parse_args(argv):
-	path = " ".join(argv[1:])
-	name = path[path.rindex('/') + 1:]
+	# get path from arguments
+	path = argv[1]
+	# extract torrent name from path (basename of path)
+	name = os.path.basename(os.path.normpath(path))
 	return name, path
 
 
 def download_subtitles(name):
-	v = Video.fromname(name)
-	subs = download_best_subtitles([v], {Language("eng")})
-	save_subtitles(v, subs[v])
-	return f"{name[:-4]}.en.srt"
+	# download subtitles using subliminal
+	subprocess.run(['subliminal', 'download', name, '-l', 'en'])
+	return f"{os.path.splitext(name)[0]}.en.srt"
 
 
 def get_media_server_path():
-	base_dir = Config().read('base_directory')
-	media_server_dir = Config().read('media_server_directory')
+	# build media_server_path and return
+	base_dir = config.read('base_directory')
+	media_server_dir = config.read('media_server_directory')
 	return os.path.join(base_dir, media_server_dir)
 
 
-def move_to_server(filename):
-	shutil.move(filename, f'{ get_media_server_path() }/{ filename }')
-
-
-def embed_subs(vidfile, subfile):
-	outfile = vidfile[:-4] + "[SUBBED].mkv"
-	subprocess.run(["ffmpeg", "-i", vidfile, "-i", subfile,
+def encode_subs(vidfile, subfile):
+	# extract filename and extension from vidfile
+	filename, ext = os.path.splitext(vidfile)
+	# build new filename
+	outfile = f"{filename}[SUBBED].mkv"
+	# use ffmpeg to encode subtitles
+	p = subprocess.run(["ffmpeg", "-i", vidfile, "-i", subfile,
 					"-c", "copy", "-c:s", "srt", outfile])
+	
+	if p.returncode != 0:
+		raise Exception('Subs encoding failed')
+
 	return outfile
 
 
 def is_video(f):
-	exts = ['.mkv', '.mp4', '.avi', '.m4v']
-	for e in exts:
-		if f.endswith(e):
-			return True
-	return False
+	_, ext = os.path.splitext(f)
+	return ext in ['.mkv', '.mp4', '.avi', '.m4v']
 
 
 def reencode_audio(vidfile):
-	outfile = vidfile[:-4] + "[RENC].mkv"
+	# extract filename and extension from vidfile
+	filename, ext = os.path.splitext(vidfile)
+	# build new filename
+	outfile = f"{filename}[RENC].mkv"
+	# use ffmpeg to re-encode audio
 	subprocess.run(["ffmpeg", "-i", vidfile, "-c:v",
 					"copy", "-c:a", "ac3", outfile])
 	return outfile
 
 
 def get_audio_codec(vidfile):
+	# get name of audio codec
 	out = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a:0", "-show_entries",
 						  "stream=codec_name", "-of", "default=noprint_wrappers=1:nokey=1", vidfile], stdout=PIPE).stdout
 	return out.decode().strip()
 
 
 def main():
-	name, base_path = parse_args(sys.argv)
+
+	# get location of download
+	name, root_path = parse_args(sys.argv)
+
 	bot = Bot()
-
+	
+	# inform user that the torrent has downloaded
 	bot.send_master_message(f'{name} has been downloaded.')
-	
-	# only download subs for shows inside tvshows subdirectory
+
+	# search for videos in the download path
+	videos = []
+	for path, _dirs, files in os.walk(root_path, topdown=False):
+		for f in files:
+			if is_video(f):
+				videos.append(f)
+
+	# end program if there are no videos in the download
+	if len(videos) == 0:
+		return
+
+	# inform user and wait for subs_wait_period
 	bot.send_master_message(f'Waiting for subs for {name}.')
-
-	sleep(int(Config().read('subs_wait_period')))
+	sleep_for = int(config.read('subs_wait_period'))
+	sleep(sleep_for)
 	
-	for path, _dirs, files in os.walk(base_path, topdown=False):
-		for vidfile in files:
-			if is_video(vidfile):
+	# for each video in the download path
+	for vidfile in videos:
 
-				changedir(path)
+		# change to video dir
+		changedir(path)
 
-				if get_audio_codec(vidfile) == 'eac3':
-					vidfile = reencode_audio(vidfile)
+		# if the audio is eac3, re-encode to ac3
+		# eac3 is generally unsupported by Sony Bravia devices
+		if get_audio_codec(vidfile) == 'eac3':
+			# save original file name
+			tmpvidfile = vidfile
+			# re-encode audio to ac3 and update file name
+			vidfile = reencode_audio(vidfile)
+			# delete original file
+			os.remove(tmpvidfile)
 
-				try:
-					subfile = download_subtitles(vidfile)
-					vidfile = embed_subs(vidfile, subfile)
-				except:
-					bot.send_master_message(f'Failed to encode subs for {vidfile}.')
-
-		bot.send_master_message(f'{name} has finished being subbed.')
-
+		try:
+			# download subtitles for the video
+			subfile = download_subtitles(vidfile)
+			# encode subs into the video file using ffmpeg
+			vidfile = encode_subs(vidfile, subfile)
+			# inform user of successful encoding
+			bot.send_master_message(f'Successfully encoded subs for {vidfile}.')
+		except:
+			# inform user of failure
+			bot.send_master_message(f'Failed to encode subs for {vidfile}.')
 
 if __name__ == "__main__":
+	# move to script dir to allow local imports
 	changedir()
 	sys.path.append('../')
 	from bot import Bot
 	from config import Config
+
+	# create a new global config object
+	global config
+	config = Config()
+	
 	main()

@@ -8,6 +8,7 @@ from bot import Bot
 import json
 from modules.music_module import embed_music_metadata
 from proxy_manager import update_proxy as _update_proxy
+from gtagger import gTagger
 
 bot = Bot()
 config = Config()
@@ -40,8 +41,12 @@ def download_youtube_audio(params, chat_id, msg_id):
 		# get title and filename from youtube-dl
 		title = js['title']
 		filename = f"{os.path.splitext(js['_filename'])[0]}.mp3"
+
 		# update title and filename from metadata
-		title, filename = embed_music_metadata(title, filename, genius_url)
+		genius_token = config.read('genius_api_token')
+		if genius_token != None:
+			title, filename  = gTagger(genius_token).tag(title, filename, genius_url)
+
 		# replace original json values
 		js['title'] = title
 		js['_filename'] = filename

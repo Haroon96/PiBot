@@ -16,6 +16,8 @@ class Config:
 		self.config[key] = value
 
 	def read(self, key):
+		if key not in self.config or str(self.config[key]).strip() == '':
+			return None
 		return self.config[key]
 
 	def save(self):
