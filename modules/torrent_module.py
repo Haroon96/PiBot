@@ -93,14 +93,10 @@ def main():
 			if is_video(f):
 				videos.append(f)
 
-	# end program if there are no videos in the download
-	if len(videos) == 0:
-		return
-
 	# inform user and wait for subs_wait_period
-	bot.send_master_message(f'Waiting for subs for {name}.')
-	sleep_for = int(config.read('subs_wait_period'))
-	sleep(sleep_for)
+	# bot.send_master_message(f'Waiting for subs for {name}.')
+	# sleep_for = int(config.read('subs_wait_period'))
+	# sleep(sleep_for)
 	
 	# for each video in the download path
 	for vidfile in videos:
@@ -118,16 +114,16 @@ def main():
 			# delete original file
 			os.remove(tmpvidfile)
 
-		try:
+		# try:
 			# download subtitles for the video
-			subfile = download_subtitles(vidfile)
+			# subfile = download_subtitles(vidfile)
 			# encode subs into the video file using ffmpeg
-			vidfile = encode_subs(vidfile, subfile)
+			# vidfile = encode_subs(vidfile, subfile)
 			# inform user of successful encoding
-			bot.send_master_message(f'Successfully encoded subs for {vidfile}.')
-		except:
+			# bot.send_master_message(f'Successfully encoded subs for {vidfile}.')
+		# except:
 			# inform user of failure
-			bot.send_master_message(f'Failed to encode subs for {vidfile}.')
+			# bot.send_master_message(f'Failed to encode subs for {vidfile}.')
 
 if __name__ == "__main__":
 	# move to script dir to allow local imports
